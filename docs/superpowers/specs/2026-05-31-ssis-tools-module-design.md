@@ -38,7 +38,7 @@ The module is built on the existing **Sampler** scaffold already present in the 
 | Decision | Choice |
 |----------|--------|
 | Scope | All five functional areas (phased delivery) |
-| Assembly source | Bundle `Microsoft.SqlServer.Management.IntegrationServices` + deps via NuGet restore at build time; ship `net4x` DLLs in the module |
+| Assembly source | Depend on the `dbatools.library` PowerShell module (RequiredModule) and load the MOM from its `desktop/lib/` at import. The MOM (`Microsoft.SqlServer.Management.IntegrationServices.dll`) is **not** distributed via NuGet or the `SqlServer` module — `dbatools.library` is the only redistributable source. |
 | Runtime | Windows PowerShell 5.1 / .NET Framework, `Desktop` edition only |
 | Connection | `-SqlInstance` (string *or* SMO `Server`/`SqlConnection` object) + `-SqlCredential` (PSCredential); Windows integrated auth by default |
 | Noun prefix | `Ssis` (known collisions with Gallery modules `MSBITools` / `SqlBIManager` accepted; module-qualified names are the fallback) |
@@ -56,7 +56,8 @@ Private helpers
   - Get-SsisInteropCatalog              <- builds IntegrationServices/Catalog from a connection
   - thin interop wrappers               <- one tiny function per .NET call we make (testable seam)
         |
-Bundled assemblies (lib/)               <- Microsoft.SqlServer.Management.IntegrationServices.dll + deps
+MOM assemblies                          <- Microsoft.SqlServer.Management.IntegrationServices.dll + deps,
+                                           loaded at import from the dbatools.library module's desktop/lib/
 ```
 
 The thin interop wrappers exist so that public-function logic (parameter resolution, validation,
@@ -110,18 +111,25 @@ properties and methods remain accessible for advanced use.
 - **Naming:** singular nouns, approved verbs only; `Publish-`/`Export-` for deploy/retrieve of
   `.ispac`; `Start-`/`Stop-`/`Wait-` for execution lifecycle.
 
-## 7. Build & packaging (NuGet bundling)
+## 7. Dependency & assembly loading (`dbatools.library`)
 
-- A build step (a `prebuild`-style task wired into `build.yaml`'s `build` workflow, e.g.
-  `Restore_SSIS_Assemblies`, runnable standalone) restores the
-  `Microsoft.SqlServer.Management.IntegrationServices` NuGet package and its transitive
-  dependencies (SMO + SqlClient), then copies the `.NET Framework` (`net4x`) DLLs into
-  `source/lib/`.
-- `source/lib/` is added to `CopyPaths` in `build.yaml` so ModuleBuilder ships it inside the
-  built module under `module/<version>/lib/`.
-- The `.psm1` loads the assemblies at import time via `Add-Type -Path` against the module-relative
-  `lib/` folder (resolved from `$PSScriptRoot`), with a clear error if a DLL is missing.
-- `source/lib/` is git-ignored (restored artifacts), so `.gitignore` is updated accordingly.
+The MOM is not on NuGet; the only redistributable source is the `dbatools.library` module,
+which ships `Microsoft.SqlServer.Management.IntegrationServices.dll` (plus
+`IntegrationServicesEnum` and `IntegrationServices.Common.ObjectModel`) and the full SMO stack in
+its `desktop/lib/` folder (the .NET Framework build for Windows PowerShell).
+
+- `RequiredModules.psd1` adds `dbatools.library` (pinned to a known-good minimum version) so the
+  build/test environment restores it; the manifest's `RequiredModules` also declares it so it is
+  present at import.
+- At import, the `.psm1` resolves the dependency's library folder via
+  `(Get-Module -ListAvailable dbatools.library | Sort-Object Version -Descending | Select-Object -First 1).ModuleBase`
+  joined with `desktop\lib`, then `Add-Type -Path` the three MOM assemblies from there.
+- Because the MOM has transitive dependencies (SMO, `Sdk.Sfc`, `ConnectionInfo`, SqlClient) that
+  also live in that folder, the `.psm1` registers an `AppDomain.AssemblyResolve` handler scoped to
+  that folder so dependent assemblies resolve on demand.
+- A clear, actionable error is thrown at import if `dbatools.library` (or the expected DLLs) cannot
+  be found, telling the user to `Install-Module dbatools.library`.
+- No binaries are committed to this repo and no NuGet restore step is added.
 
 ## 8. Testing strategy
 
@@ -142,10 +150,11 @@ properties and methods remain accessible for advanced use.
 Each phase becomes its own implementation plan (plan → implement → review). This spec covers the
 whole architecture; the first plan tackles **Phase 0 + Phase 1**.
 
-- **Phase 0 — Foundation:** NuGet restore build task; assembly loading in `.psm1`;
-  `Connect-SsisCatalog` + interop seam; type/format files; manifest updates
-  (`PowerShellVersion = '5.1'`, `CompatiblePSEditions = @('Desktop')`); test conventions;
-  `Get-SsisCatalog`.
+- **Phase 0 — Foundation:** add `dbatools.library` dependency (`RequiredModules.psd1` + manifest
+  `RequiredModules`); MOM assembly loading in `.psm1` (resolve `dbatools.library` `desktop/lib`,
+  `Add-Type` the three DLLs, register `AssemblyResolve` handler); `Connect-SsisCatalog` + interop
+  seam; type/format files; manifest updates (`PowerShellVersion = '5.1'`,
+  `CompatiblePSEditions = @('Desktop')`); test conventions; `Get-SsisCatalog`.
 - **Phase 1 — Catalog admin + Folders:** `New-SsisCatalog`, `Set-SsisCatalog`;
   `Get/New/Set/Remove-SsisFolder`.
 - **Phase 2 — Projects/Packages:** `Get/Publish/Export/Remove-SsisProject`, `Get-SsisPackage`.
@@ -155,9 +164,9 @@ whole architecture; the first plan tackles **Phase 0 + Phase 1**.
 
 ## 10. Acceptance criteria (Phase 0 + 1)
 
-- `./build.ps1 -Tasks build` restores the SSIS NuGet package, copies `net4x` DLLs to `source/lib/`,
-  and produces a built module that imports cleanly in Windows PowerShell 5.1 with the assemblies
-  loaded.
+- With `dbatools.library` installed, `./build.ps1 -Tasks build` produces a built module that imports
+  cleanly in Windows PowerShell 5.1 with the MOM assemblies loaded from `dbatools.library`'s
+  `desktop/lib/`; importing without `dbatools.library` present fails with a clear, actionable error.
 - `Get-SsisCatalog -SqlInstance <inst>` returns an `Ssis.Catalog` object (or `$null`/warning when
   SSISDB is absent) with a clean default format view.
 - `New-SsisCatalog`, `Set-SsisCatalog`, and the four `*-SsisFolder` commands work against a real
@@ -168,10 +177,14 @@ whole architecture; the first plan tackles **Phase 0 + Phase 1**.
 
 ## 11. Risks & open items (resolved during planning)
 
-1. **NuGet package identity & target frameworks** — confirm the exact package name/version that
-   ships `Microsoft.SqlServer.Management.IntegrationServices.dll` for `.NET Framework`, and its full
-   transitive dependency set (SMO, `System.Data.SqlClient`/`Microsoft.Data.SqlClient`). This is the
-   top unknown and is verified first in Phase 0.
-2. **Integration host** — requires a real SQL Server with SSISDB; LocalDB is insufficient.
-3. **Git** — the repo is not yet a git repository; initialize it so the spec and code can be
-   committed.
+1. **Assembly source (RESOLVED 2026-05-31).** Investigation showed the MOM is not on NuGet, not in
+   the core/SSMS SMO packages, and not in the `SqlServer` module. The only redistributable source is
+   the `dbatools.library` module (`desktop/lib/Microsoft.SqlServer.Management.IntegrationServices.dll`
+   + `IntegrationServicesEnum` + `IntegrationServices.Common.ObjectModel`). Decision: depend on
+   `dbatools.library` (see §7).
+2. **`dbatools.library` coupling** — we depend on a third-party module's assembly versions and its
+   `desktop/lib/` layout. Mitigations: pin a minimum version, resolve the path defensively, register
+   an `AssemblyResolve` handler for transitive deps, and fail import with a clear message if absent.
+   Watch for SqlClient/SMO load conflicts if both `dbatools` and this module are imported together.
+3. **Integration host** — requires a real SQL Server with SSISDB; LocalDB is insufficient.
+4. **Git** — initialized 2026-05-31 on `main`; spec and code are committed there.
