@@ -86,6 +86,14 @@ Pester:
   OutputFormat: NUnitXML
   # Excludes one or more paths from being used to calculate code coverage.
   ExcludeFromCodeCoverage:
+    - Private/Connect-SsisCatalog
+    - Private/Get-SsisCatalogObject
+    - Private/New-SsisCatalogObject
+    - Private/Set-SsisCatalogObject
+    - Private/Get-SsisFolderObject
+    - Private/New-SsisFolderObject
+    - Private/Set-SsisFolderObject
+    - Private/Remove-SsisFolderObject
 
   # If no scripts are defined the default is to use all the tests under the project's
   # tests folder or source folder (if present). Test script paths can be defined to

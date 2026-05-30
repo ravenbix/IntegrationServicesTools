@@ -21,6 +21,7 @@
     ChangelogManagement         = 'latest'
     Sampler                     = 'latest'
     'Sampler.GitHubTasks'       = 'latest'
+    'dbatools.library'          = 'latest'
 
 
 }

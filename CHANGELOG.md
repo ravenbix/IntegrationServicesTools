@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- For new features.
+- Module foundation: load the SSIS object model from dbatools.library; dbatools-style connection helper.
 
 ### Changed
 
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- For now removed features.
+- Placeholder Get-Something / Get-PrivateFunction sample functions.
 
 ### Fixed
 
