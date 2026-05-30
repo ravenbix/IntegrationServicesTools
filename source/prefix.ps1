@@ -25,7 +25,7 @@ if (-not (Test-Path -Path $script:SsisLibFolder))
 }
 
 $script:SsisAssemblyResolver = [System.ResolveEventHandler] {
-    param ($eventSender, $eventArgs)
+    param ($sender, $eventArgs)
 
     $simpleName = ($eventArgs.Name -split ',')[0].Trim()
     $candidatePath = Join-Path -Path $script:SsisLibFolder -ChildPath ($simpleName + '.dll')
@@ -35,10 +35,16 @@ $script:SsisAssemblyResolver = [System.ResolveEventHandler] {
         return [System.Reflection.Assembly]::LoadFrom($candidatePath)
     }
 
+    # Returning $null tells the CLR to continue to the next resolver.
     return $null
 }
 
-[System.AppDomain]::CurrentDomain.add_AssemblyResolve($script:SsisAssemblyResolver)
+# Register once per process; Import-Module -Force re-runs this prefix each time.
+if (-not $script:SsisAssemblyResolverRegistered)
+{
+    [System.AppDomain]::CurrentDomain.add_AssemblyResolve($script:SsisAssemblyResolver)
+    $script:SsisAssemblyResolverRegistered = $true
+}
 
 foreach ($assemblyName in @(
         'Microsoft.SqlServer.Management.IntegrationServices',
