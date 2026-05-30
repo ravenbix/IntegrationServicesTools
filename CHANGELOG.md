@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Declare `Configuration` and `Metadata` required modules so the build bootstrap installs
   ModuleBuilder's dependencies (the build previously failed resolving them).
+- Load the SSIS assemblies through a compiled assembly resolver instead of a PowerShell
+  scriptblock, fixing a StackOverflow that occurred when PSScriptAnalyzer ran while the module
+  was imported.
 
 ### Security
 
