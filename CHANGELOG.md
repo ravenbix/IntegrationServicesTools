@@ -23,7 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- For any bug fix.
+- Declare `Configuration` and `Metadata` required modules so the build bootstrap installs
+  ModuleBuilder's dependencies (the build previously failed resolving them).
 
 ### Security
 

@@ -16,6 +16,8 @@
     PSScriptAnalyzer            = 'latest'
     Pester                      = 'latest'
     ModuleBuilder               = 'latest'
+    Configuration               = 'latest'  # ModuleBuilder dependency (not auto-resolved by bootstrap)
+    Metadata                    = 'latest'  # Configuration dependency
     ChangelogManagement         = 'latest'
     Sampler                     = 'latest'
     'Sampler.GitHubTasks'       = 'latest'
