@@ -114,23 +114,20 @@ CompatiblePSEditions = @('Desktop')
 
 # was: RequiredModules = @()
 RequiredModules = @(
-    @{ ModuleName = 'dbatools.library'; ModuleVersion = '2024.1.0' }
+    @{ ModuleName = 'dbatools.library'; ModuleVersion = '2025.12.28' }
 )
-
-# was: # FormatsToProcess = @()
-FormatsToProcess = @('IntegrationServicesTools.format.ps1xml')
 ```
-> Note: pin `ModuleVersion` to the lowest `dbatools.library` you have verified (adjust if your installed version differs — check with `(Get-Module dbatools.library -ListAvailable).Version`).
+> Note: `FormatsToProcess` is intentionally NOT set here — it is added in Task 5 together with the
+> format file it references, so the module stays importable after every task. `2025.12.28` is the
+> verified `dbatools.library` version that ships the MOM (v17.100); adjust the floor if needed.
+> `Configuration`/`Metadata` are already present in `RequiredModules.psd1` from the baseline fix.
 
-- [ ] **Step 3: Enable `prefix.ps1`, copy the format file, exclude interop from coverage in `build.yaml`**
+- [ ] **Step 3: Exclude interop wrappers from coverage in `build.yaml`**
 
-Under the `ModuleBuilder Configuration` block, uncomment/add:
-```yaml
-prefix: prefix.ps1
-CopyPaths:
-  - en-US
-  - IntegrationServicesTools.format.ps1xml
-```
+> The `prefix: prefix.ps1` setting is added in Task 2 (with `prefix.ps1`), and the format-file
+> `CopyPaths` entry in Task 5 (with the format file) — so each task's build references only files
+> that exist.
+
 Under `Pester:` set the coverage exclusions (interop wrappers cannot be unit-tested):
 ```yaml
   ExcludeFromCodeCoverage:
@@ -160,10 +157,10 @@ Under the `## [Unreleased]` heading in `CHANGELOG.md` add:
 - Placeholder Get-Something / Get-PrivateFunction sample functions.
 ```
 
-- [ ] **Step 6: Bootstrap and confirm the build still runs**
+- [ ] **Step 6: Bootstrap and confirm the build is green**
 
 Run: `./build.ps1 -ResolveDependency -Tasks build`
-Expected: build succeeds and installs `dbatools.library`. The build will FAIL importing the module because `prefix.ps1` and the format file don't exist yet — that's expected and fixed in Task 2/5. If you prefer a green build here, do Task 2 and Task 5 before re-running. (Order chosen so the dependency is in place first.)
+Expected: build succeeds and installs `dbatools.library` (large download; the first run is slow). With the placeholders removed and no `FormatsToProcess`/`prefix` referencing missing files, the built module imports cleanly — it simply has no exported functions yet.
 
 - [ ] **Step 7: Commit**
 
@@ -177,9 +174,17 @@ git commit -m "build: add dbatools.library dependency, target PS5.1, remove plac
 ## Task 2: MOM assembly loader (`prefix.ps1`)
 
 **Files:**
+- Modify: `build.yaml` (enable the `prefix` setting)
 - Create: `source/prefix.ps1`
 
-- [ ] **Step 1: Write `source/prefix.ps1`**
+- [ ] **Step 1: Enable `prefix.ps1` in `build.yaml`**
+
+Under the `ModuleBuilder Configuration` block (near `BuiltModuleSubdirectory` / `CopyPaths`), add:
+```yaml
+prefix: prefix.ps1
+```
+
+- [ ] **Step 2: Write `source/prefix.ps1`**
 
 ```powershell
 # ------------------------------------------------------------------------------
@@ -234,7 +239,7 @@ foreach ($assemblyName in @(
 }
 ```
 
-- [ ] **Step 2: Build and verify the module imports with the MOM loaded**
+- [ ] **Step 3: Build and verify the module imports with the MOM loaded**
 
 Run:
 ```powershell
@@ -245,7 +250,7 @@ Import-Module IntegrationServicesTools -Force -ErrorAction Stop
 ```
 Expected: import succeeds; the last line prints the type (`IsPublic ... IntegrationServices`), proving the assembly loaded.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```powershell
 git add -A
@@ -559,8 +564,8 @@ git commit -m "feat: add Get-SsisCatalogObject and Add-SsisTypeName helpers"
 
 **Files:**
 - Create: `source/IntegrationServicesTools.format.ps1xml`
-
-> Already wired into the manifest (`FormatsToProcess`) and `build.yaml` (`CopyPaths`) in Task 1.
+- Modify: `source/IntegrationServicesTools.psd1` (set `FormatsToProcess`)
+- Modify: `build.yaml` (add the format file to `CopyPaths`)
 
 - [ ] **Step 1: Write `source/IntegrationServicesTools.format.ps1xml`**
 
@@ -618,7 +623,21 @@ git commit -m "feat: add Get-SsisCatalogObject and Add-SsisTypeName helpers"
 </Configuration>
 ```
 
-- [ ] **Step 2: Build and verify the format file loads with the module**
+- [ ] **Step 2: Wire up the format file**
+
+In `source/IntegrationServicesTools.psd1`:
+```powershell
+# was: # FormatsToProcess = @()
+FormatsToProcess = @('IntegrationServicesTools.format.ps1xml')
+```
+In `build.yaml`, add the format file to `CopyPaths` (alongside `en-US`):
+```yaml
+CopyPaths:
+  - en-US
+  - IntegrationServicesTools.format.ps1xml
+```
+
+- [ ] **Step 3: Build and verify the format file loads with the module**
 
 Run:
 ```powershell
@@ -629,7 +648,7 @@ Get-FormatData -TypeName 'Ssis.Catalog' | Should -Not -BeNullOrEmpty
 ```
 Expected: import succeeds and `Get-FormatData` returns the view (no error).
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```powershell
 git add -A
