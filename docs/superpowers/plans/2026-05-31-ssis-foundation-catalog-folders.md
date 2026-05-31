@@ -12,6 +12,34 @@
 
 ---
 
+## Phase 0 outcomes & Phase 1 amendments (read before resuming)
+
+Phase 0 (Tasks 1–6) is **complete and committed**; the build is green (41 tests, 1 integration
+skipped). Implementation surfaced facts that change the remaining tasks — apply these:
+
+1. **`prefix.ps1` uses a COMPILED (`Add-Type`/C#) assembly resolver**, not the scriptblock shown in
+   Task 2 below. A scriptblock `AssemblyResolve` handler StackOverflows when PSScriptAnalyzer runs
+   with the module imported. The committed `source/prefix.ps1` is authoritative; do not revert it.
+2. **Sampler QA gates *private* functions too.** Every private interop wrapper added in Tasks 7 & 10
+   needs its own `tests/Unit/Private/<Name>.tests.ps1`, must pass PSScriptAnalyzer, and must have full
+   comment-based help. Test guidance per wrapper:
+   - **Connect via `[Type]::new()` that hits SQL** (`New-SsisCatalogObject`, `New-SsisFolderObject`):
+     unit test is a parameter-contract test via `InModuleScope` (assert the command exists and exposes
+     the expected parameters). Real behavior is covered by Integration tests.
+   - **Operate on a passed-in object** (`Set-SsisCatalogObject`, `Set-SsisFolderObject`,
+     `Remove-SsisFolderObject`): behavior test with a fake object — `[PSCustomObject]` with settable
+     properties and an `Alter`/`Drop` `ScriptMethod` added via `Add-Member`.
+   - **Read a collection** (`Get-SsisFolderObject`): behavior test with a hashtable-backed `.Folders`
+     (a hashtable supports `.Contains(name)` and `[name]`), exactly like `Get-SsisCatalogObject`'s test.
+3. **`PSUseOutputTypeCorrectly` is excluded** in `tests/QA/module.tests.ps1` (it misfires on functions
+   returning native MOM types once the assemblies are loaded). Already done.
+4. **Coverage threshold stays 85%, met via Integration tests.** Interop wrappers open real SQL
+   connections, so the 85% gate is only reached when the test run includes Integration tests against a
+   real SSISDB (`$env:SSIS_TEST_INSTANCE`). Phase 1 must therefore add Integration tests that exercise
+   catalog create/config and folder CRUD (not only the unit tests below).
+5. Single-file `Invoke-Pester` needs both `output/module` and `output/RequiredModules` on
+   `$env:PSModulePath` (see the TDD loop below).
+
 ## Verified facts (do not re-investigate)
 
 - The MOM (`Microsoft.SqlServer.Management.IntegrationServices.dll`) is **not** on NuGet/in the SqlServer module. The only redistributable source is `dbatools.library`, which ships it under `<ModuleBase>\desktop\lib\` (verified: loads cleanly in PS 5.1, MOM v17.100, 121 dependency DLLs).
