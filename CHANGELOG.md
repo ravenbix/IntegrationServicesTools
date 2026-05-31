@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Set-SsisCatalog command.
 - New-SsisCatalog command.
 - Get-SsisCatalog command.
 - Module foundation: load the SSIS object model from dbatools.library; dbatools-style connection helper.
