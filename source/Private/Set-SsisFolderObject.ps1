@@ -19,6 +19,7 @@ function Set-SsisFolderObject
         .PARAMETER Description
             The new description to store on the folder. Pass an empty string to clear it.
     #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Thin interop wrapper; ShouldProcess is implemented by the public command (Set-SsisFolder) that calls this seam.')]
     [CmdletBinding()]
     [OutputType('Microsoft.SqlServer.Management.IntegrationServices.CatalogFolder')]
     param

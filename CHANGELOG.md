@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- For changes in existing functionality.
+- New-SsisCatalog keeps the catalog encryption password as a SecureString end-to-end, converting
+  to the plain string the object model requires only at the point of the call.
 
 ### Deprecated
 

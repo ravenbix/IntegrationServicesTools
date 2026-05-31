@@ -18,12 +18,15 @@ function New-SsisCatalogObject
             The IntegrationServices object (from Connect-SsisCatalog) representing the target server.
 
         .PARAMETER Password
-            The catalog encryption password as plain text, used to protect sensitive catalog data.
+            The catalog encryption password as a SecureString, used to protect sensitive catalog
+            data. It is converted to the plain string the object model requires only at the point of
+            the call.
 
         .PARAMETER Name
             The catalog name to create. The SSIS catalog must be named 'SSISDB', so this defaults to
             that value and rarely needs to be changed.
     #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Thin interop wrapper; ShouldProcess is implemented by the public command (New-SsisCatalog) that calls this seam.')]
     [CmdletBinding()]
     [OutputType('Microsoft.SqlServer.Management.IntegrationServices.Catalog')]
     param
@@ -33,7 +36,7 @@ function New-SsisCatalogObject
         $IntegrationServices,
 
         [Parameter(Mandatory = $true)]
-        [string]
+        [System.Security.SecureString]
         $Password,
 
         [Parameter()]
@@ -43,7 +46,10 @@ function New-SsisCatalogObject
 
     process
     {
-        $catalog = [Microsoft.SqlServer.Management.IntegrationServices.Catalog]::new($IntegrationServices, $Name, $Password)
+        # The MOM Catalog constructor requires the password as a plain string; convert from the
+        # SecureString at the last moment via NetworkCredential.
+        $plainPassword = [System.Net.NetworkCredential]::new('', $Password).Password
+        $catalog = [Microsoft.SqlServer.Management.IntegrationServices.Catalog]::new($IntegrationServices, $Name, $plainPassword)
         $catalog.Create()
         return $catalog
     }

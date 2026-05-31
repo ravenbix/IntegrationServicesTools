@@ -64,8 +64,7 @@ function New-SsisCatalog
 
         if ($PSCmdlet.ShouldProcess([string] $SqlInstance, 'Create SSISDB catalog'))
         {
-            $password = $CatalogPassword.GetNetworkCredential().Password
-            $catalog = New-SsisCatalogObject -IntegrationServices $integrationServices -Password $password
+            $catalog = New-SsisCatalogObject -IntegrationServices $integrationServices -Password $CatalogPassword.Password
             $catalog | Add-SsisTypeName -TypeName 'Ssis.Catalog'
         }
     }

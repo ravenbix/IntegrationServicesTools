@@ -16,6 +16,7 @@ function Remove-SsisFolderObject
         .PARAMETER Folder
             The CatalogFolder object to drop, as returned by Get-SsisFolderObject.
     #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Thin interop wrapper; ShouldProcess is implemented by the public command (Remove-SsisFolder) that calls this seam.')]
     [CmdletBinding()]
     [OutputType([void])]
     param

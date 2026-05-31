@@ -21,6 +21,7 @@ function Set-SsisCatalogObject
             A hashtable of catalog property names to values to assign before calling Alter(), for
             example @{ OperationLogRetentionTime = 365; OperationCleanupEnabled = $true }.
     #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Thin interop wrapper; ShouldProcess is implemented by the public command (Set-SsisCatalog) that calls this seam.')]
     [CmdletBinding()]
     [OutputType('Microsoft.SqlServer.Management.IntegrationServices.Catalog')]
     param

@@ -23,6 +23,7 @@ function New-SsisFolderObject
         .PARAMETER Description
             A description stored on the new folder. Pass an empty string when no description is wanted.
     #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Thin interop wrapper; ShouldProcess is implemented by the public command (New-SsisFolder) that calls this seam.')]
     [CmdletBinding()]
     [OutputType('Microsoft.SqlServer.Management.IntegrationServices.CatalogFolder')]
     param
