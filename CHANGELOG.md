@@ -12,9 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Set the code coverage threshold to 70%. The private interop wrappers open real SQL
-  connections so they can only be exercised by the opt-in Integration tests, and a merged
-  module cannot exclude individual functions from coverage.
+- For changes in existing functionality.
 
 ### Deprecated
 
