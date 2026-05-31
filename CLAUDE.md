@@ -160,11 +160,12 @@ PSScriptAnalyzer runs with the module imported**. Do not revert it to a scriptbl
 - **QA** (`tests/QA`): help quality, PSScriptAnalyzer, manifest correctness must pass.
   `PSUseOutputTypeCorrectly` is intentionally excluded in `tests/QA/module.tests.ps1` — it only
   activates once the SSIS assemblies are loaded and misfires on functions returning native MOM types.
-- **Code coverage threshold is 70%** (`build.yaml`), not the scaffold default of 85%. The interop
+- **Code coverage threshold is 85%** (`build.yaml`, the scaffold default) and is met ONLY when the
+  run includes the Integration tests against a real SSISDB (`$env:SSIS_TEST_INSTANCE`). The interop
   wrappers open a real SQL connection on construction, so they are integration-only; and because
   ModuleBuilder merges every function into a single `.psm1`, the file-based `ExcludeFromCodeCoverage`
-  setting cannot exclude individual functions. The lower threshold accounts for that — keep genuinely
-  testable logic well covered.
+  setting cannot exclude individual functions. Unit-only runs therefore fall under the bar — keep
+  genuinely testable logic well covered and exercise the interop seam from Integration tests.
 - **Single-file test runs** need BOTH `output/module` AND `output/RequiredModules` on
   `$env:PSModulePath` (importing the module pulls in `dbatools.library`).
 - When parameters change, update the parameter-validation tests. Add 1–3 focused tests per new
