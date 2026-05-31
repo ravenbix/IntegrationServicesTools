@@ -141,9 +141,19 @@ its `desktop/lib/` folder (the .NET Framework build for Windows PowerShell).
   var such as `$env:SSIS_TEST_INSTANCE`). Documented setup. **Note:** LocalDB cannot host SSISDB,
   so a full SQL Server (Developer/Express with the SSISDB-capable engine) is required.
 - **QA tests** (existing): help quality, script analyzer, manifest correctness.
-- **Code coverage:** the scaffold's 85% threshold conflicts with interop-only code. Resolution:
-  exclude the thin interop wrappers from coverage (`Pester.ExcludeFromCodeCoverage` in
-  `build.yaml`) so the threshold applies to genuinely testable logic, rather than lowering the bar.
+- **Code coverage:** the 85% threshold is kept. The intended approach (exclude interop wrappers via
+  `Pester.ExcludeFromCodeCoverage`) proved **infeasible** — ModuleBuilder merges all functions into a
+  single `.psm1`, and that setting filters whole files, so it matches nothing. Instead, the interop
+  wrappers (which open real SQL connections via `IntegrationServices`, so they cannot be unit-tested)
+  are covered by the **Integration tests**. Consequence: the 85% gate is only met when the test run
+  includes Integration tests against a real SSISDB (`$env:SSIS_TEST_INSTANCE`); a unit-only run reports
+  a coverage shortfall by design.
+- **QA scope:** Sampler's QA tests enumerate **all** module functions (public *and* private), so every
+  private function also requires a unit test file, clean PSScriptAnalyzer, and full comment-based help.
+  The Information-level `PSUseOutputTypeCorrectly` rule is excluded (it misfires on functions returning
+  native MOM types once the assemblies are loaded).
+- **Assembly loading:** the MOM is loaded by a **compiled** (`Add-Type`) `AssemblyResolve` handler in
+  `prefix.ps1`; a PowerShell-scriptblock handler recurses and overflows the stack under PSScriptAnalyzer.
 
 ## 9. Phased delivery
 

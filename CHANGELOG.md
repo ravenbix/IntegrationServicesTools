@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- For new features.
+- Set-SsisFolder and Remove-SsisFolder commands.
+- New-SsisFolder command.
+- Get-SsisFolder command.
+- Set-SsisCatalog command.
+- New-SsisCatalog command.
+- Get-SsisCatalog command.
+- Module foundation: load the SSIS object model from dbatools.library; dbatools-style connection helper.
 
 ### Changed
 
-- For changes in existing functionality.
+- New-SsisCatalog keeps the catalog encryption password as a SecureString end-to-end, converting
+  to the plain string the object model requires only at the point of the call.
 
 ### Deprecated
 
@@ -19,11 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- For now removed features.
+- Placeholder Get-Something / Get-PrivateFunction sample functions.
 
 ### Fixed
 
-- For any bug fix.
+- Declare `Configuration` and `Metadata` required modules so the build bootstrap installs
+  ModuleBuilder's dependencies (the build previously failed resolving them).
+- Load the SSIS assemblies through a compiled assembly resolver instead of a PowerShell
+  scriptblock, fixing a StackOverflow that occurred when PSScriptAnalyzer ran while the module
+  was imported.
 
 ### Security
 

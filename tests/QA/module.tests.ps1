@@ -155,7 +155,10 @@ Describe 'Quality for module' -Tags 'TestQuality' {
     It 'Should pass Script Analyzer for <Name>' -ForEach $testCases -Skip:(-not $scriptAnalyzerRules) {
         $functionFile = Get-ChildItem -Path $sourcePath -Recurse -Include "$Name.ps1"
 
-        $pssaResult = (Invoke-ScriptAnalyzer -Path $functionFile.FullName)
+        # PSUseOutputTypeCorrectly (Information) is excluded: it is type-inference based and
+        # only activates once the SSIS object-model assemblies are loaded, where it misfires
+        # on functions that deliberately return native MOM types (e.g. via [Type]::new()).
+        $pssaResult = (Invoke-ScriptAnalyzer -Path $functionFile.FullName -ExcludeRule 'PSUseOutputTypeCorrectly')
         $report = $pssaResult | Format-Table -AutoSize | Out-String -Width 110
         $pssaResult | Should -BeNullOrEmpty -Because `
             "some rule triggered.`r`n`r`n $report"

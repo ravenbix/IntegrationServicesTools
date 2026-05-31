@@ -6,6 +6,7 @@
 BuiltModuleSubdirectory: module
 CopyPaths:
   - en-US
+  - IntegrationServicesTools.format.ps1xml
 #  - DSCResources
   # - Modules
 Encoding: UTF8
@@ -17,7 +18,7 @@ Encoding: UTF8
 
 # Suffix to add to Root module PSM1 after merge (here, the Set-Alias exporting IB tasks)
 # suffix: suffix.ps1
-# prefix: prefix.ps1
+prefix: prefix.ps1
 VersionedOutputDirectory: true
 
 ####################################################
@@ -84,7 +85,14 @@ BuildWorkflow:
 
 Pester:
   OutputFormat: NUnitXML
-  # Excludes one or more paths from being used to calculate code coverage.
+  # ExcludeFromCodeCoverage filters whole FILES out of the built module, but
+  # ModuleBuilder merges every function into a single .psm1, so per-function paths
+  # match nothing here. Coverage is therefore all-or-nothing on the merged module.
+  # The thin private interop wrappers (e.g. the SMO/IntegrationServices connection
+  # path) cannot be unit-tested - constructing IntegrationServices eagerly opens a
+  # SQL connection - so they are covered by the opt-in Integration tests instead.
+  # Consequently the threshold below is only reached when the test run INCLUDES the
+  # Integration tests against a real SSISDB (set $env:SSIS_TEST_INSTANCE).
   ExcludeFromCodeCoverage:
 
   # If no scripts are defined the default is to use all the tests under the project's
@@ -101,7 +109,7 @@ Pester:
   #  - FunctionalQuality
   #  - TestQuality
   Tag:
-  CodeCoverageThreshold: 85 # Set to 0 to bypass
+  CodeCoverageThreshold: 85 # Met only when Integration tests run against a real SSISDB (see note above)
   #CodeCoverageOutputFile: JaCoCo_$OsShortName.xml
   #CodeCoverageOutputFileEncoding: ascii
   # Use this if code coverage should be merged from several pipeline test jobs.
