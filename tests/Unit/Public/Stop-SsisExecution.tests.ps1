@@ -37,9 +37,11 @@ Describe 'Stop-SsisExecution' {
         Should -Invoke -CommandName Stop-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
-    It 'Warns and does not stop when the execution does not exist' {
+    It 'Errors and does not stop when the execution does not exist' {
         Mock -CommandName Get-SsisExecutionObject -ModuleName $script:moduleName -MockWith { $null }
-        $null = Stop-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 999 -Confirm:$false -WarningAction SilentlyContinue
+        $errors = @()
+        $null = Stop-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 999 -Confirm:$false -ErrorVariable errors -ErrorAction SilentlyContinue
+        $errors.Count | Should -BeGreaterThan 0
         Should -Invoke -CommandName Stop-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
