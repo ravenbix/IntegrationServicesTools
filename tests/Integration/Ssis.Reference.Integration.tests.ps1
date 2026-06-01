@@ -13,23 +13,30 @@ BeforeAll {
     $script:projectName = 'ISTools_TestProject'
     $script:environmentName = 'RefEnv'
 
-    $existingFolder = Get-SsisFolder -SqlInstance $script:instance -Name $script:folderName -WarningAction SilentlyContinue
+    # SSISDB only drops EMPTY folders, so a folder must be drained of its projects and environments
+    # before it can be removed (used by both setup pre-clean and teardown).
+    $script:removeFolderIfPresent = {
+        param ($instance, $folderName)
 
-    if ($existingFolder)
-    {
-        Remove-SsisFolder -SqlInstance $script:instance -Name $script:folderName -Confirm:$false
+        if (Get-SsisFolder -SqlInstance $instance -Name $folderName -WarningAction SilentlyContinue)
+        {
+            Get-SsisProject -SqlInstance $instance -Folder $folderName -WarningAction SilentlyContinue |
+                ForEach-Object -Process { Remove-SsisProject -SqlInstance $instance -Folder $folderName -Name $_.Name -Confirm:$false }
+
+            Get-SsisEnvironment -SqlInstance $instance -Folder $folderName -WarningAction SilentlyContinue |
+                ForEach-Object -Process { Remove-SsisEnvironment -SqlInstance $instance -Folder $folderName -Name $_.Name -Confirm:$false }
+
+            Remove-SsisFolder -SqlInstance $instance -Name $folderName -Confirm:$false
+        }
     }
+
+    & $script:removeFolderIfPresent $script:instance $script:folderName
 
     New-SsisFolder -SqlInstance $script:instance -Name $script:folderName -Description 'Created by integration test' -Confirm:$false | Out-Null
 }
 
 AfterAll {
-    $existingFolder = Get-SsisFolder -SqlInstance $script:instance -Name $script:folderName -WarningAction SilentlyContinue
-
-    if ($existingFolder)
-    {
-        Remove-SsisFolder -SqlInstance $script:instance -Name $script:folderName -Confirm:$false
-    }
+    & $script:removeFolderIfPresent $script:instance $script:folderName
 
     Get-Module -Name $script:moduleName -All | Remove-Module -Force
 }

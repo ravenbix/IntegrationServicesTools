@@ -18,7 +18,7 @@ Describe 'New-SsisEnvironmentReference' {
         $script:refCalls = 0
         Mock -CommandName Get-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -MockWith {
             $script:refCalls++
-            if ($script:refCalls -ge 2) { @([PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = '' }) }
+            if ($script:refCalls -ge 2) { @([PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = '.' }) }
             else { @() }
         }
     }
@@ -39,7 +39,7 @@ Describe 'New-SsisEnvironmentReference' {
     }
 
     It 'Errors and does not create when the reference already exists' {
-        Mock -CommandName Get-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -MockWith { @([PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = '' }) }
+        Mock -CommandName Get-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -MockWith { @([PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = '.' }) }
         $null = New-SsisEnvironmentReference -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
         $err | Should -Not -BeNullOrEmpty
         Should -Invoke -CommandName New-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It

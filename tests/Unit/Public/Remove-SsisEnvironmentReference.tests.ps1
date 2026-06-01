@@ -14,7 +14,7 @@ Describe 'Remove-SsisEnvironmentReference' {
         Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith { [PSCustomObject]@{ Name = 'Finance' } }
         Mock -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -MockWith { [PSCustomObject]@{ Name = 'Sales' } }
         Mock -CommandName Get-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -MockWith {
-            @([PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = '' })
+            @([PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = '.' })
         }
         Mock -CommandName Remove-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -MockWith { }
     }

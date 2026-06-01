@@ -128,11 +128,13 @@ function New-SsisEnvironmentReference
 
         $folderBound = $PSBoundParameters.ContainsKey('EnvironmentFolder')
 
+        # A relative reference (no folder bound) reports its EnvironmentFolderName as '.' in the
+        # catalog, not as an empty string, so the relative match accepts both.
         $existing = Get-SsisEnvironmentReferenceObject -Project $projectObject |
             Where-Object -FilterScript {
                 $_.Name -eq $Environment -and
                 (($folderBound -and $_.EnvironmentFolderName -eq $EnvironmentFolder) -or
-                 (-not $folderBound -and [string]::IsNullOrEmpty($_.EnvironmentFolderName)))
+                 (-not $folderBound -and ([string]::IsNullOrEmpty($_.EnvironmentFolderName) -or $_.EnvironmentFolderName -eq '.')))
             }
 
         if ($null -ne $existing)
@@ -159,7 +161,7 @@ function New-SsisEnvironmentReference
                 Where-Object -FilterScript {
                     $_.Name -eq $Environment -and
                     (($folderBound -and $_.EnvironmentFolderName -eq $EnvironmentFolder) -or
-                     (-not $folderBound -and [string]::IsNullOrEmpty($_.EnvironmentFolderName)))
+                     (-not $folderBound -and ([string]::IsNullOrEmpty($_.EnvironmentFolderName) -or $_.EnvironmentFolderName -eq '.')))
                 }
 
             $new | Add-SsisTypeName -TypeName 'Ssis.EnvironmentReference'
