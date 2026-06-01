@@ -177,4 +177,10 @@ function Get-SsisCatalog
         $bytes = [System.IO.File]::ReadAllBytes($script:outFile)
         ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) | Should -BeFalse
     }
+
+    It 'does not write the file when -WhatIf is given' {
+        $noWrite = Join-Path -Path $TestDrive -ChildPath 'whatif.md'
+        Update-SsisReadme -TemplatePath $script:tpl -SourcePath $script:srcDir -OutputPath $noWrite -WhatIf
+        Test-Path -Path $noWrite | Should -BeFalse
+    }
 }

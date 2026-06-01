@@ -347,10 +347,12 @@ function Update-SsisReadme
 
         $content = ConvertTo-SsisReadme @splatReadme
 
-        if ($PSCmdlet.ShouldProcess($OutputPath, 'Write generated README'))
+        $resolvedOutput = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
+
+        if ($PSCmdlet.ShouldProcess($resolvedOutput, 'Write generated README'))
         {
             $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
-            [System.IO.File]::WriteAllText($OutputPath, $content, $utf8NoBom)
+            [System.IO.File]::WriteAllText($resolvedOutput, $content, $utf8NoBom)
         }
     }
 }
