@@ -165,7 +165,7 @@
           <TableRowEntry>
             <TableColumnItems>
               <TableColumnItem><ScriptBlock>$_.Parent.Name</ScriptBlock></TableColumnItem>
-              <TableColumnItem><PropertyName>EnvironmentName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>EnvironmentFolderName</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>ReferenceType</PropertyName></TableColumnItem>
             </TableColumnItems>
@@ -195,7 +195,7 @@
               <TableColumnItem><PropertyName>DataType</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>Sensitive</PropertyName></TableColumnItem>
               <TableColumnItem><PropertyName>Required</PropertyName></TableColumnItem>
-              <TableColumnItem><ScriptBlock>if ($_.ReferencedVariableName) { '@' + $_.ReferencedVariableName } else { $_.Value }</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>if ($_.ReferencedVariableName) { '@' + $_.ReferencedVariableName } else { $_.DefaultValue }</ScriptBlock></TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>
         </TableRowEntries>
