@@ -35,6 +35,11 @@ Describe 'Set-SsisEnvironmentVariable' {
         Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Sensitive -eq $true }
     }
 
+    It 'Forwards the description to the interop wrapper' {
+        $null = Set-SsisEnvironmentVariable -SqlInstance 'TestInstance' -Folder 'Finance' -Environment 'Prod' -Name 'Port' -Value 1 -Description 'db port' -Confirm:$false
+        Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Description -eq 'db port' }
+    }
+
     It 'Warns and does not set when the catalog does not exist' {
         Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
         $null = Set-SsisEnvironmentVariable -SqlInstance 'TestInstance' -Folder 'Finance' -Environment 'Prod' -Name 'Port' -Value 1 -Confirm:$false -WarningAction SilentlyContinue
@@ -56,6 +61,7 @@ Describe 'Set-SsisEnvironmentVariable' {
     It 'Supports -WhatIf and does not set' {
         $null = Set-SsisEnvironmentVariable -SqlInstance 'TestInstance' -Folder 'Finance' -Environment 'Prod' -Name 'Port' -Value 1 -WhatIf
         Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName Get-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
     It 'Forwards the SqlCredential to Connect-SsisCatalog' {
