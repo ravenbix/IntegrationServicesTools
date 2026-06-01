@@ -97,5 +97,57 @@
         </TableRowEntries>
       </TableControl>
     </View>
+    <View>
+      <Name>Ssis.Environment</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.Environment</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Folder</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Variables</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Description</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>$_.Parent.Name</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>$_.Variables.Count</ScriptBlock></TableColumnItem>
+              <TableColumnItem><PropertyName>Description</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Ssis.EnvironmentVariable</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.EnvironmentVariable</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Environment</Label></TableColumnHeader>
+          <TableColumnHeader><Label>DataType</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Value</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Sensitive</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Description</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>$_.Parent.Name</ScriptBlock></TableColumnItem>
+              <TableColumnItem><PropertyName>Type</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Value</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Sensitive</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Description</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
   </ViewDefinitions>
 </Configuration>
