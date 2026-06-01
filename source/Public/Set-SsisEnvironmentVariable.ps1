@@ -6,9 +6,10 @@ function Set-SsisEnvironmentVariable
 
         .DESCRIPTION
             Connects to the specified SQL Server instance and adds or updates a variable on an SSISDB
-            environment (upsert: updates the value when the variable exists, otherwise creates it). The
-            variable's data type is inferred from the supplied value's .NET type and can be overridden by
-            -DataType. -Sensitive stores the value encrypted on the server. Accepts a piped
+            environment (upsert: updates the type, value, sensitivity, and description when the variable
+            exists, otherwise creates it). The variable's data type is inferred from the supplied
+            value's type and can be overridden by -DataType; updating an existing variable retypes it
+            to match. -Sensitive stores the value encrypted on the server. Accepts a piped
             Ssis.Environment object as the target. Writes a warning and makes no change when the catalog,
             folder, or environment does not exist. Returns the resulting Ssis.EnvironmentVariable.
 
@@ -50,9 +51,8 @@ function Set-SsisEnvironmentVariable
 
         .PARAMETER DataType
             An explicit SSIS data type name (Boolean, Byte, Int16, Int32, Int64, Single, Double, Decimal,
-            DateTime, String) that overrides the type inferred from -Value. Applies only when the variable
-            is being created; the data type of an existing variable cannot be changed and -DataType is
-            ignored on update.
+            DateTime, String) that overrides the type inferred from -Value. Applied whether the variable
+            is being created or updated, so an existing variable is retyped to match.
 
         .PARAMETER Sensitive
             Stores the variable value encrypted (sensitive) on the server. Sensitive values are returned

@@ -52,6 +52,11 @@ Describe 'Environment lifecycle' -Tag 'Integration' {
         $updated = Set-SsisEnvironmentVariable -SqlInstance $script:instance -Folder $script:folderName -Environment $script:environmentName -Name 'Port' -Value 1450 -Confirm:$false
         $updated.Value | Should -Be 1450
 
+        # Retype the variable in place (Int32 -> String) by setting a string value.
+        $retyped = Set-SsisEnvironmentVariable -SqlInstance $script:instance -Folder $script:folderName -Environment $script:environmentName -Name 'Port' -Value 'localhost' -Confirm:$false
+        $retyped.Type | Should -Be ([System.TypeCode]::String)
+        $retyped.Value | Should -Be 'localhost'
+
         # Remove a variable.
         Get-SsisEnvironmentVariable -SqlInstance $script:instance -Folder $script:folderName -Environment $script:environmentName -Name 'Port' |
             Remove-SsisEnvironmentVariable -Confirm:$false

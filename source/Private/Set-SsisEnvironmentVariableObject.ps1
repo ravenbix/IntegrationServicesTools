@@ -5,10 +5,10 @@ function Set-SsisEnvironmentVariableObject
             Adds or updates a variable on an SSISDB environment and persists the change.
 
         .DESCRIPTION
-            When the named variable already exists on the environment its value, sensitivity, and
-            description are updated; otherwise a new variable is added with the supplied type code. The
-            change is persisted by calling Alter() on the environment. Internal interop helper, not
-            exported from the module.
+            When the named variable already exists on the environment its type, value, sensitivity, and
+            description are updated; otherwise a new variable is added. In both cases the variable takes
+            the supplied type code. The change is persisted by calling Alter() on the environment.
+            Internal interop helper, not exported from the module.
 
         .EXAMPLE
             Set-SsisEnvironmentVariableObject -Environment $environment -Name 'Port' -Value 1433 -TypeCode ([System.TypeCode]::Int32) -Sensitive $false -Description 'db port'
@@ -25,7 +25,7 @@ function Set-SsisEnvironmentVariableObject
             The value to store in the variable. Its meaning follows the variable's type code.
 
         .PARAMETER TypeCode
-            The System.TypeCode the variable is created with when it does not already exist.
+            The System.TypeCode the variable is given, whether it is being created or updated.
 
         .PARAMETER Sensitive
             Whether the variable value is stored encrypted (sensitive) on the server.
@@ -73,6 +73,7 @@ function Set-SsisEnvironmentVariableObject
         if ($Environment.Variables.Contains($Name))
         {
             $variable = $Environment.Variables[$Name]
+            $variable.Type = $TypeCode
             $variable.Value = $Value
             $variable.Sensitive = $Sensitive
             $variable.Description = $Description

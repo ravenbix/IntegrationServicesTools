@@ -32,19 +32,21 @@ Describe 'Set-SsisEnvironmentVariableObject' {
         }
     }
 
-    It 'Updates the existing variable value and alters the environment when the variable exists' {
+    It 'Updates the existing variable type, value, sensitivity, and description and alters the environment' {
         InModuleScope $script:moduleName {
             # Update branch: a hashtable supports .Contains(name) (IDictionary.Contains) and the [name]
-            # indexer, returning the live variable object the wrapper mutates.
-            $existing = [PSCustomObject]@{ Name = 'Port'; Value = 1; Sensitive = $false; Description = 'old' }
+            # indexer, returning the live variable object the wrapper mutates. The existing variable
+            # starts as Int32 and is retyped to String to prove the type is updated in place.
+            $existing = [PSCustomObject]@{ Name = 'Port'; Type = [System.TypeCode]::Int32; Value = 1; Sensitive = $false; Description = 'old' }
             $environment = [PSCustomObject]@{ Variables = @{ 'Port' = $existing }; AlterCalled = $false }
             $environment | Add-Member -MemberType 'ScriptMethod' -Name 'Alter' -Value { $this.AlterCalled = $true }
 
-            Set-SsisEnvironmentVariableObject -Environment $environment -Name 'Port' -Value 1433 -TypeCode ([System.TypeCode]::Int32) -Sensitive $true -Description 'db port'
+            Set-SsisEnvironmentVariableObject -Environment $environment -Name 'Port' -Value 'localhost' -TypeCode ([System.TypeCode]::String) -Sensitive $true -Description 'db host'
 
-            $existing.Value | Should -Be 1433
+            $existing.Type | Should -Be ([System.TypeCode]::String)
+            $existing.Value | Should -Be 'localhost'
             $existing.Sensitive | Should -BeTrue
-            $existing.Description | Should -Be 'db port'
+            $existing.Description | Should -Be 'db host'
             $environment.AlterCalled | Should -BeTrue
         }
     }
