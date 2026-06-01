@@ -37,6 +37,17 @@ Describe 'Get-SsisPackage' {
             $result = Get-SsisPackage -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
             $result | Should -BeNullOrEmpty
         }
+
+        It 'Enumerates packages across all folders and projects when scopes are omitted' {
+            Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith {
+                @([PSCustomObject]@{ Name = 'F1' }, [PSCustomObject]@{ Name = 'F2' })
+            }
+
+            $result = Get-SsisPackage -SqlInstance 'TestInstance'
+
+            ($result | Measure-Object).Count | Should -Be 2
+            Should -Invoke -CommandName Get-SsisPackageObject -ModuleName $script:moduleName -Times 2 -Scope It
+        }
     }
 
     Context 'ByObject' {
