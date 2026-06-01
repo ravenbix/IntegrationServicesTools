@@ -74,6 +74,7 @@ function Get-SsisEnvironment
     process
     {
         $environmentParameters = @{}
+        $found = $false
 
         if ($PSBoundParameters.ContainsKey('Name'))
         {
@@ -88,8 +89,14 @@ function Get-SsisEnvironment
             {
                 if ($null -ne $environment)
                 {
+                    $found = $true
                     $environment | Add-SsisTypeName -TypeName 'Ssis.Environment'
                 }
+            }
+
+            if ($PSBoundParameters.ContainsKey('Name') -and -not $found)
+            {
+                Write-Warning -Message ('Environment ''{0}'' was not found in the SSISDB catalog.' -f $Name)
             }
 
             return
@@ -135,9 +142,15 @@ function Get-SsisEnvironment
             {
                 if ($null -ne $environment)
                 {
+                    $found = $true
                     $environment | Add-SsisTypeName -TypeName 'Ssis.Environment'
                 }
             }
+        }
+
+        if ($PSBoundParameters.ContainsKey('Name') -and -not $found)
+        {
+            Write-Warning -Message ('Environment ''{0}'' was not found in the SSISDB catalog.' -f $Name)
         }
     }
 }

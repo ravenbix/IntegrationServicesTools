@@ -45,6 +45,25 @@ Describe 'Get-SsisEnvironment' {
             $result = Get-SsisEnvironment -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
             $result | Should -BeNullOrEmpty
         }
+
+        It 'Warns when a named environment is not found' {
+            Mock -CommandName Get-SsisEnvironmentObject -ModuleName $script:moduleName -MockWith { $null }
+            Get-SsisEnvironment -SqlInstance 'TestInstance' -Folder 'Finance' -Name 'Missing' -WarningVariable warnings -WarningAction SilentlyContinue | Out-Null
+            $warnings | Should -Not -BeNullOrEmpty
+        }
+
+        It 'Warns and returns nothing when the named folder does not exist' {
+            Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith { $null }
+            $result = Get-SsisEnvironment -SqlInstance 'TestInstance' -Folder 'Nope' -WarningVariable warnings -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            $warnings | Should -Not -BeNullOrEmpty
+        }
+
+        It 'Forwards the SqlCredential to Connect-SsisCatalog' {
+            $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString 'p' -AsPlainText -Force))
+            Get-SsisEnvironment -SqlInstance 'TestInstance' -Folder 'Finance' -SqlCredential $credential | Out-Null
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $null -ne $SqlCredential }
+        }
     }
 
     Context 'ByObject' {
