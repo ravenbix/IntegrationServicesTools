@@ -251,8 +251,7 @@ function Start-SsisExecution
 
         if ($Synchronous)
         {
-            $execution | Add-SsisTypeName -TypeName 'Ssis.Execution' |
-                Wait-SsisExecution -PollInterval $PollInterval -Timeout $Timeout
+            $execution | Wait-SsisExecution -PollInterval $PollInterval -Timeout $Timeout
         }
         else
         {
