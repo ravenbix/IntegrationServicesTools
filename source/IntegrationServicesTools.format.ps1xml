@@ -231,5 +231,57 @@
         </TableRowEntries>
       </TableControl>
     </View>
+    <View>
+      <Name>Ssis.ExecutionMessage</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.ExecutionMessage</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>MessageTime</Label></TableColumnHeader>
+          <TableColumnHeader><Label>MessageSourceType</Label></TableColumnHeader>
+          <TableColumnHeader><Label>MessageType</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Message</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>MessageTime</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>MessageSourceType</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>MessageType</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Message</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Ssis.Operation</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.Operation</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Id</Label></TableColumnHeader>
+          <TableColumnHeader><Label>OperationType</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Status</Label></TableColumnHeader>
+          <TableColumnHeader><Label>StartTime</Label></TableColumnHeader>
+          <TableColumnHeader><Label>EndTime</Label></TableColumnHeader>
+          <TableColumnHeader><Label>CallerName</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Id</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>OperationType</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Status</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>StartTime</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>EndTime</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>CallerName</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
   </ViewDefinitions>
 </Configuration>
