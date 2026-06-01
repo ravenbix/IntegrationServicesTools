@@ -81,6 +81,12 @@ function Remove-SsisEnvironmentVariable
         {
             $environmentObject = $InputObject.Parent
             $variableName = $InputObject.Name
+
+            if ($null -eq $environmentObject)
+            {
+                Write-Error -Message 'The piped Ssis.EnvironmentVariable object has no parent environment.'
+                return
+            }
         }
         else
         {

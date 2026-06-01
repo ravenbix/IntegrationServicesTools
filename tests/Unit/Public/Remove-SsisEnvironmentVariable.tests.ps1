@@ -68,5 +68,14 @@ Describe 'Remove-SsisEnvironmentVariable' {
                 $Name -eq 'Port' -and $Environment.Name -eq 'Prod'
             }
         }
+
+        It 'Errors when the piped variable has no parent environment' {
+            $variable = [PSCustomObject]@{ Name = 'Port'; Parent = $null }
+            $variable.PSObject.TypeNames.Insert(0, 'Ssis.EnvironmentVariable')
+
+            $variable | Remove-SsisEnvironmentVariable -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+            $err | Should -Not -BeNullOrEmpty
+            Should -Invoke -CommandName Remove-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        }
     }
 }
