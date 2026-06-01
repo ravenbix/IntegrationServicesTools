@@ -41,6 +41,18 @@ Describe 'New-SsisEnvironment' {
         Should -Invoke -CommandName New-SsisEnvironmentObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
+    It 'Errors and does not create when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = New-SsisEnvironment -SqlInstance 'TestInstance' -Folder 'Finance' -Name 'Prod' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName New-SsisEnvironmentObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Forwards the description to New-SsisEnvironmentObject' {
+        $null = New-SsisEnvironment -SqlInstance 'TestInstance' -Folder 'Finance' -Name 'Prod' -Description 'Production env' -Confirm:$false
+        Should -Invoke -CommandName New-SsisEnvironmentObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Description -eq 'Production env' }
+    }
+
     Context 'ByObject' {
         It 'Creates in a piped folder without connecting' {
             $folder = [PSCustomObject]@{ Name = 'Finance' }
