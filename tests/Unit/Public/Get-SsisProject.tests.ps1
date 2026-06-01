@@ -52,6 +52,19 @@ Describe 'Get-SsisProject' {
             $result | Should -BeNullOrEmpty
             $warnings | Should -Not -BeNullOrEmpty
         }
+
+        It 'Warns and returns nothing when the named folder does not exist' {
+            Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith { $null }
+            $result = Get-SsisProject -SqlInstance 'TestInstance' -Folder 'Nope' -WarningVariable warnings -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            $warnings | Should -Not -BeNullOrEmpty
+        }
+
+        It 'Forwards the SqlCredential to Connect-SsisCatalog' {
+            $cred = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString 'p@ss' -AsPlainText -Force))
+            $null = Get-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -SqlCredential $cred
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $SqlCredential.UserName -eq 'sa' }
+        }
     }
 
     Context 'ByObject' {

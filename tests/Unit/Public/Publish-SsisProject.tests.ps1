@@ -49,4 +49,26 @@ Describe 'Publish-SsisProject' {
         $null = Publish-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -Path 'C:\out\Sales.ispac' -WhatIf
         Should -Invoke -CommandName Publish-SsisProjectObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
+
+    It 'Forwards the SqlCredential to Connect-SsisCatalog' {
+        $cred = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString 'p@ss' -AsPlainText -Force))
+        $null = Publish-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -Path 'C:\out\Sales.ispac' -SqlCredential $cred -Confirm:$false
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $SqlCredential.UserName -eq 'sa' }
+    }
+
+    It 'Errors and does not deploy when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = Publish-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -Path 'C:\out\Sales.ispac' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName Publish-SsisProjectObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Deploys into a piped Ssis.Folder without connecting' {
+        $folder = [PSCustomObject]@{ Name = 'Finance' }
+        $folder.PSObject.TypeNames.Insert(0, 'Ssis.Folder')
+
+        $null = $folder | Publish-SsisProject -Path 'C:\out\Sales.ispac' -Confirm:$false
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName Publish-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Folder.Name -eq 'Finance' -and $Name -eq 'Sales' }
+    }
 }

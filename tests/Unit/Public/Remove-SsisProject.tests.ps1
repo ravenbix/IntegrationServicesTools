@@ -41,4 +41,24 @@ Describe 'Remove-SsisProject' {
         Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
         Should -Invoke -CommandName Remove-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Project.Name -eq 'Sales' }
     }
+
+    It 'Forwards the SqlCredential to Connect-SsisCatalog' {
+        $cred = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString 'p@ss' -AsPlainText -Force))
+        Remove-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -Name 'Sales' -SqlCredential $cred -Confirm:$false
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $SqlCredential.UserName -eq 'sa' }
+    }
+
+    It 'Errors when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        Remove-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -Name 'Sales' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName Remove-SsisProjectObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Errors when the folder does not exist' {
+        Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith { $null }
+        Remove-SsisProject -SqlInstance 'TestInstance' -Folder 'Nope' -Name 'Sales' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName Remove-SsisProjectObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
 }
