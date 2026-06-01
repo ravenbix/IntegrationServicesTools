@@ -252,8 +252,6 @@ function ConvertTo-SsisReadme
                 ForEach-Object -Process { Get-SsisReadmeCommandInfo -Path $_.FullName }
         )
 
-        $dash = [char]0x2014
-
         $lines = [System.Collections.Generic.List[string]]::new()
         $lines.Add('## Command reference')
         $lines.Add('')
@@ -277,13 +275,18 @@ function ConvertTo-SsisReadme
         {
             $lines.Add('')
             $lines.Add("### $($group.Name)")
+            $lines.Add('')
+            $lines.Add('| Command | Synopsis |')
+            $lines.Add('| --- | --- |')
 
             $ordered = $group.Group |
                 Sort-Object -Property $verbSort
 
             foreach ($command in $ordered)
             {
-                $lines.Add("- **$($command.Name)** $dash $($command.Synopsis)")
+                # Escape any literal pipe in a synopsis so it cannot break the Markdown table cell.
+                $cell = $command.Synopsis -replace '\|', '\|'
+                $lines.Add("| **$($command.Name)** | $cell |")
             }
         }
 

@@ -110,10 +110,34 @@ MIT
         $result.IndexOf('Get-SsisCatalog') | Should -BeLessThan $result.IndexOf('New-SsisCatalog')
     }
 
-    It 'includes each synopsis next to its command' {
+    It 'renders each command as a Markdown table row' {
         $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $script:sourceDir
-        $dash = [char]0x2014
-        $result | Should -Match "\*\*Get-SsisFolder\*\* $dash Gets folders\."
+        $result | Should -Match '\| \*\*Get-SsisFolder\*\* \| Gets folders\. \|'
+    }
+
+    It 'emits a table header for each command group' {
+        $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $script:sourceDir
+        $result | Should -Match '\| Command \| Synopsis \|'
+        $result | Should -Match '\| --- \| --- \|'
+        ([regex]::Matches($result, '\| Command \| Synopsis \|')).Count | Should -Be 3
+    }
+
+    It 'escapes pipe characters in a synopsis so table rows stay intact' {
+        $pipeDir = Join-Path -Path $TestDrive -ChildPath 'PipeSource'
+        New-Item -Path $pipeDir -ItemType Directory -Force | Out-Null
+        Set-Content -Path (Join-Path $pipeDir 'Get-SsisThing.ps1') -Encoding UTF8 -Value @'
+function Get-SsisThing
+{
+    <#
+        .SYNOPSIS
+            Returns A | B.
+    #>
+    [CmdletBinding()]
+    param ()
+}
+'@
+        $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $pipeDir
+        $result | Should -Match '\| \*\*Get-SsisThing\*\* \| Returns A \\\| B\. \|'
     }
 
     It 'preserves the surrounding template prose' {
