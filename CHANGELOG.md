@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Set-SsisEnvironmentVariable command.
 - Get-SsisEnvironmentVariable command.
 - Remove-SsisEnvironment command.
 - New-SsisEnvironment command.
