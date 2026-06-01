@@ -201,5 +201,35 @@
         </TableRowEntries>
       </TableControl>
     </View>
+    <View>
+      <Name>Ssis.Execution</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.Execution</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Id</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Folder</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Project</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Package</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Status</Label></TableColumnHeader>
+          <TableColumnHeader><Label>StartTime</Label></TableColumnHeader>
+          <TableColumnHeader><Label>EndTime</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Id</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>FolderName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>ProjectName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>PackageName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Status</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>StartTime</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>EndTime</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
   </ViewDefinitions>
 </Configuration>
