@@ -20,6 +20,15 @@ through SQL Server Management Studio.
 It targets administrators and DevOps engineers who automate SSIS deployments and want
 composable, pipeline-friendly commands that return real objects.
 
+## Motivation
+
+Administering the SSISDB catalog usually means clicking through SQL Server Management
+Studio dialogs or hand-writing calls to the `catalog.*` stored procedures — neither of
+which composes, scripts, or version-controls cleanly. IntegrationServicesTools closes
+that gap: it exposes the Integration Services managed object model as idiomatic,
+pipeline-friendly PowerShell so catalog setup, project deployment, environment wiring,
+and parameter binding become repeatable, reviewable automation instead of manual steps.
+
 ## Features
 
 - **Catalog administration** — create, inspect, and configure the SSISDB catalog.
@@ -38,6 +47,21 @@ composable, pipeline-friendly commands that return real objects.
   SSIS managed object model assemblies this module loads at import. Install with
   `Install-Module dbatools.library`.
 - **Windows integrated authentication** by default; SQL logins are supported via `-SqlCredential`.
+
+### Supported SQL Server versions
+
+The module targets the on-premises database engine and supports every release that ships
+the SSISDB catalog:
+
+| SQL Server release | Database engine version | SSISDB (Project Deployment Model) |
+| --- | --- | --- |
+| 2012 | 11.0 | Yes (SSISDB introduced) |
+| 2014 | 12.0 | Yes |
+| 2016 | 13.0 | Yes |
+| 2017 | 14.0 | Yes |
+| 2019 | 15.0 | Yes |
+| 2022 | 16.0 | Yes |
+| 2025 | 17.0 | Yes |
 
 ## Installation
 
@@ -287,6 +311,16 @@ the latter is generated.
 ## Status
 
 See [CHANGELOG.md](CHANGELOG.md) for released and unreleased changes.
+
+## Code of Conduct
+
+This project adopts the [Contributor Covenant](CODE_OF_CONDUCT.md) code of conduct. By
+participating, you are expected to uphold it.
+
+## Security
+
+To report a security vulnerability, follow the process in [SECURITY.md](SECURITY.md) —
+please do not open a public issue for security bugs.
 
 ## License & acknowledgements
 

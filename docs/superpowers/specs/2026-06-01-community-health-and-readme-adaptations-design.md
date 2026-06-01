@@ -81,7 +81,10 @@ Temporary Ban / Permanent Ban), and attribution footer.
   | 2022 | 16.0 | ✔ |
   | 2025 | 17.0 | ✔ |
 
-  With a note that **LocalDB cannot host SSISDB**.
+  The **LocalDB cannot host SSISDB** caveat is stated once, in the existing *Requirements*
+  bullet immediately above the table, rather than repeated in the table preamble (the table
+  preamble was deduplicated during implementation to avoid stating it twice in the same
+  section).
 - **Footer links** — add *Code of Conduct* (`CODE_OF_CONDUCT.md`) and *Security*
   (`SECURITY.md`) references in the Contributing / footer area.
 - The `<!-- SSIS:COMMANDS -->` token and surrounding prose are unchanged; only the
