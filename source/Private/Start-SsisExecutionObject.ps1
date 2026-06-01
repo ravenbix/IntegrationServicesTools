@@ -86,7 +86,7 @@ function Start-SsisExecutionObject
         {
             foreach ($parameterName in $Parameter.Keys)
             {
-                if ($Package.Parameters.ContainsKey($parameterName))
+                if ($Package.Parameters.Contains($parameterName))
                 {
                     $objectType = 30
                 }

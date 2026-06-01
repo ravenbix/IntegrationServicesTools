@@ -31,7 +31,6 @@ Describe 'Start-SsisExecutionObject' {
 
     It 'Adds a logging-level value set (object type 50) when -LoggingLevel is given' {
         InModuleScope $script:moduleName {
-            $captured = $null
             $package = [PSCustomObject]@{}
             $package | Add-Member -MemberType 'NoteProperty' -Name 'Parameters' -Value @{}
             $package | Add-Member -MemberType 'ScriptMethod' -Name 'Execute' -Value {
