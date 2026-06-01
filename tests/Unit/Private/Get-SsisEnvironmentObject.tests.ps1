@@ -10,6 +10,8 @@ AfterAll {
 Describe 'Get-SsisEnvironmentObject' {
     It 'Returns the named environment when it exists' {
         InModuleScope $script:moduleName {
+            # A hashtable is a faithful stand-in for the MOM Environments collection: it
+            # supports both .Contains(name) and the [name] indexer.
             $environment = [PSCustomObject]@{ Name = 'Prod' }
             $folder = [PSCustomObject]@{ Environments = @{ 'Prod' = $environment } }
 

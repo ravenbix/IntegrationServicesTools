@@ -10,6 +10,8 @@ AfterAll {
 Describe 'Get-SsisEnvironmentVariableObject' {
     It 'Returns the named variable when it exists' {
         InModuleScope $script:moduleName {
+            # A hashtable is a faithful stand-in for the MOM Variables collection: it
+            # supports both .Contains(name) and the [name] indexer.
             $variable = [PSCustomObject]@{ Name = 'ConnString' }
             $environment = [PSCustomObject]@{ Variables = @{ 'ConnString' = $variable } }
 
