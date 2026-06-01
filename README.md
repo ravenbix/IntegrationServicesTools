@@ -84,7 +84,7 @@ Get-SsisProject -SqlInstance $instance -Folder 'Finance'
 
 ## Command reference
 
-IntegrationServicesTools exposes 25 commands.
+IntegrationServicesTools exposes 26 commands.
 
 ### Catalog
 - **Get-SsisCatalog** — Gets the SSISDB catalog from a SQL Server instance.
@@ -123,6 +123,7 @@ IntegrationServicesTools exposes 25 commands.
 
 ### Execution
 - **Get-SsisExecution** — Gets package executions from the SSISDB catalog on a SQL Server instance.
+- **Stop-SsisExecution** — Stops a running SSISDB execution.
 - **Wait-SsisExecution** — Waits for an SSISDB execution to reach a terminal state.
 
 ## Usage examples
