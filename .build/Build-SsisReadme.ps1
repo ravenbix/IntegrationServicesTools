@@ -1,4 +1,4 @@
-﻿function Get-SsisReadmeNounGroup
+function Get-SsisReadmeNounGroup
 {
     <#
         .SYNOPSIS
@@ -242,7 +242,7 @@ function ConvertTo-SsisReadme
         $token = '<!-- SSIS:COMMANDS -->'
         $template = Get-Content -Raw -Path $TemplatePath
 
-        if ($template -notmatch [regex]::Escape($token))
+        if (-not $template.Contains($token))
         {
             throw "README template '$TemplatePath' does not contain the $token placeholder."
         }
@@ -252,6 +252,8 @@ function ConvertTo-SsisReadme
                 ForEach-Object -Process { Get-SsisReadmeCommandInfo -Path $_.FullName }
         )
 
+        $dash = [char]0x2014
+
         $lines = [System.Collections.Generic.List[string]]::new()
         $lines.Add('## Command reference')
         $lines.Add('')
@@ -259,6 +261,11 @@ function ConvertTo-SsisReadme
 
         $groupSort = @(
             @{ Expression = { Get-SsisReadmeGroupRank -Group $_.Name } },
+            @{ Expression = { $_.Name } }
+        )
+
+        $verbSort = @(
+            @{ Expression = { Get-SsisReadmeVerbRank -Verb $_.Verb } },
             @{ Expression = { $_.Name } }
         )
 
@@ -271,22 +278,17 @@ function ConvertTo-SsisReadme
             $lines.Add('')
             $lines.Add("### $($group.Name)")
 
-            $verbSort = @(
-                @{ Expression = { Get-SsisReadmeVerbRank -Verb $_.Verb } },
-                @{ Expression = { $_.Name } }
-            )
-
             $ordered = $group.Group |
                 Sort-Object -Property $verbSort
 
             foreach ($command in $ordered)
             {
-                $lines.Add("- **$($command.Name)** — $($command.Synopsis)")
+                $lines.Add("- **$($command.Name)** $dash $($command.Synopsis)")
             }
         }
 
         $block = $lines -join "`n"
 
-        return ($template -replace [regex]::Escape($token), $block)
+        return $template.Replace($token, $block)
     }
 }

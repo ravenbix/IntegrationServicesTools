@@ -1,4 +1,4 @@
-﻿BeforeAll {
+BeforeAll {
     $script:projectPath = "$PSScriptRoot\..\.." | Convert-Path
     . (Join-Path -Path $script:projectPath -ChildPath '.build\Build-SsisReadme.ps1')
 }
@@ -112,7 +112,8 @@ MIT
 
     It 'includes each synopsis next to its command' {
         $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $script:sourceDir
-        $result | Should -Match '\*\*Get-SsisFolder\*\* — Gets folders\.'
+        $dash = [char]0x2014
+        $result | Should -Match "\*\*Get-SsisFolder\*\* $dash Gets folders\."
     }
 
     It 'preserves the surrounding template prose' {
