@@ -1,4 +1,4 @@
-BeforeDiscovery {
+﻿BeforeDiscovery {
     $script:fixturePath = Join-Path -Path $PSScriptRoot -ChildPath 'fixtures\ISTools_TestProject.ispac'
     $script:skipIntegration = [string]::IsNullOrEmpty($env:SSIS_TEST_INSTANCE) -or -not (Test-Path -Path $script:fixturePath)
 }
@@ -55,7 +55,7 @@ Describe 'Execution lifecycle (integration)' -Tag 'Integration' -Skip:$script:sk
         }
         $execution = Start-SsisExecution @splatStart
         $execution.PSObject.TypeNames | Should -Contain 'Ssis.Execution'
-        $execution.Status.ToString() | Should -BeIn @('Succeeded', 'Failed', 'Cancelled', 'EndedUnexpectedly', 'Completed')
+        $execution.Status.ToString() | Should -BeIn @('Success', 'Failed', 'Canceled', 'UnexpectTerminated', 'Completion')
     }
 
     It 'Finds the execution by id and by status' {

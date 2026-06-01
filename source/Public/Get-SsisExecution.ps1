@@ -1,4 +1,4 @@
-function Get-SsisExecution
+﻿function Get-SsisExecution
 {
     <#
         .SYNOPSIS
@@ -52,7 +52,7 @@ function Get-SsisExecution
             -SqlInstance/-Folder/-Project/-Package to keep the existing connection.
 
         .PARAMETER Status
-            Returns only executions in the given status (for example Running, Succeeded, Failed).
+            Returns only executions in the given status (for example Running, Success, Failed).
 
         .OUTPUTS
             Ssis.Execution
@@ -91,7 +91,7 @@ function Get-SsisExecution
         $InputObject,
 
         [Parameter()]
-        [ValidateSet('Created', 'Running', 'Cancelled', 'Failed', 'Pending', 'EndedUnexpectedly', 'Succeeded', 'Stopping', 'Completed')]
+        [ValidateSet('Created', 'Running', 'Canceled', 'Failed', 'Pending', 'UnexpectTerminated', 'Success', 'Stopping', 'Completion')]
         [string]
         $Status
     )

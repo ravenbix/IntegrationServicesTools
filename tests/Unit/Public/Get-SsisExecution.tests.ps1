@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $script:moduleName = 'IntegrationServicesTools'
     Import-Module -Name $script:moduleName -Force -ErrorAction Stop
 }
@@ -15,7 +15,7 @@ Describe 'Get-SsisExecution' {
         # Three executions spanning two packages and two statuses.
         $script:allExecutions = @(
             [PSCustomObject]@{ Id = 1; FolderName = 'Finance'; ProjectName = 'Sales'; PackageName = 'Load.dtsx'; Status = 'Running' }
-            [PSCustomObject]@{ Id = 2; FolderName = 'Finance'; ProjectName = 'Sales'; PackageName = 'Load.dtsx'; Status = 'Succeeded' }
+            [PSCustomObject]@{ Id = 2; FolderName = 'Finance'; ProjectName = 'Sales'; PackageName = 'Load.dtsx'; Status = 'Success' }
             [PSCustomObject]@{ Id = 3; FolderName = 'Finance'; ProjectName = 'Sales'; PackageName = 'Other.dtsx'; Status = 'Running' }
         )
     }
@@ -43,7 +43,7 @@ Describe 'Get-SsisExecution' {
 
         $result = Get-SsisExecution -SqlInstance 'TestInstance' -Status 'Running'
         ($result | Measure-Object).Count | Should -Be 2
-        $result.Status | Should -Not -Contain 'Succeeded'
+        $result.Status | Should -Not -Contain 'Success'
     }
 
     It 'Warns and returns nothing when the catalog does not exist' {

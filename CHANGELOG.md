@@ -5,6 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Corrected ServerOperationStatus enum member names used by Wait-SsisExecution (terminalStates),
+  Get-SsisExecution (ValidateSet), and Stop-SsisExecution (help text) to match the real MOM values:
+  Success (was Succeeded), Canceled (was Cancelled), UnexpectTerminated (was EndedUnexpectedly),
+  Completion (was Completed). Prevents Wait-SsisExecution from polling to timeout on successful runs.
+- Start-SsisExecutionObject now passes a concrete Collection[ExecutionValueParameterSet] to
+  PackageInfo.Execute instead of a raw ArrayList, matching the MOM overload signature.
+
 ### Added
 
 - Wait-SsisExecution command.

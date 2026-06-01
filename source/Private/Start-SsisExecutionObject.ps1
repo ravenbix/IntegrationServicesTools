@@ -1,4 +1,4 @@
-function Start-SsisExecutionObject
+﻿function Start-SsisExecutionObject
 {
     <#
         .SYNOPSIS
@@ -71,15 +71,18 @@ function Start-SsisExecutionObject
             Verbose     = 3
         }
 
-        $setValues = [System.Collections.Generic.List[object]]::new()
+        # PackageInfo.Execute requires a Collection of the concrete MOM ExecutionValueParameterSet
+        # type; a generic List or PSCustomObject entries fail .NET's strict argument binding. The MOM
+        # assemblies are loaded at module import, so the type is constructible in unit tests too.
+        $setValues = [System.Collections.ObjectModel.Collection[Microsoft.SqlServer.Management.IntegrationServices.PackageInfo+ExecutionValueParameterSet]]::new()
 
         if ($PSBoundParameters.ContainsKey('LoggingLevel'))
         {
-            $setValues.Add([PSCustomObject]@{
-                ObjectType     = 50
-                ParameterName  = 'LOGGING_LEVEL'
-                ParameterValue = $loggingValues[$LoggingLevel]
-            })
+            $loggingValueSet = [Microsoft.SqlServer.Management.IntegrationServices.PackageInfo+ExecutionValueParameterSet]::new()
+            $loggingValueSet.ObjectType = 50
+            $loggingValueSet.ParameterName = 'LOGGING_LEVEL'
+            $loggingValueSet.ParameterValue = $loggingValues[$LoggingLevel]
+            $setValues.Add($loggingValueSet)
         }
 
         if ($PSBoundParameters.ContainsKey('Parameter'))
@@ -95,11 +98,11 @@ function Start-SsisExecutionObject
                     $objectType = 20
                 }
 
-                $setValues.Add([PSCustomObject]@{
-                    ObjectType     = $objectType
-                    ParameterName  = $parameterName
-                    ParameterValue = $Parameter[$parameterName]
-                })
+                $parameterValueSet = [Microsoft.SqlServer.Management.IntegrationServices.PackageInfo+ExecutionValueParameterSet]::new()
+                $parameterValueSet.ObjectType = $objectType
+                $parameterValueSet.ParameterName = $parameterName
+                $parameterValueSet.ParameterValue = $Parameter[$parameterName]
+                $setValues.Add($parameterValueSet)
             }
         }
 

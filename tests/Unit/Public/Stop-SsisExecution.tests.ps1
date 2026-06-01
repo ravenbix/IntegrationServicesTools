@@ -16,7 +16,7 @@ Describe 'Stop-SsisExecution' {
         }
         Mock -CommandName Stop-SsisExecutionObject -ModuleName $script:moduleName -MockWith { }
         Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
-            [PSCustomObject]@{ Id = 7; Status = 'Cancelled' }
+            [PSCustomObject]@{ Id = 7; Status = 'Canceled' }
         }
     }
 
@@ -28,7 +28,7 @@ Describe 'Stop-SsisExecution' {
 
     It 'Returns the refreshed execution with -PassThru' {
         $result = Stop-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 7 -PassThru -Confirm:$false
-        $result.Status | Should -Be 'Cancelled'
+        $result.Status | Should -Be 'Canceled'
         $result.PSObject.TypeNames | Should -Contain 'Ssis.Execution'
     }
 

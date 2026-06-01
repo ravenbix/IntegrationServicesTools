@@ -7,7 +7,7 @@ function Stop-SsisExecution
         .DESCRIPTION
             Connects to the specified SQL Server instance (or uses a piped Ssis.Execution) and requests
             cancellation of the execution. Silent by default; with -PassThru it refreshes and returns
-            the Ssis.Execution (now Stopping or Cancelled). Writes an error and makes no change when
+            the Ssis.Execution (now Stopping or Canceled). Writes an error and makes no change when
             the catalog or execution does not exist. Because cancelling an in-flight run is
             irreversible, the command prompts by default (ConfirmImpact High); suppress with
             -Confirm:$false.

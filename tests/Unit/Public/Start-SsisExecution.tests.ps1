@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $script:moduleName = 'IntegrationServicesTools'
     Import-Module -Name $script:moduleName -Force -ErrorAction Stop
 }
@@ -24,7 +24,7 @@ Describe 'Start-SsisExecution' {
             [PSCustomObject]@{ Id = 55; Status = 'Running' }
         } -ParameterFilter { $ExecutionId -eq 55 }
         Mock -CommandName Wait-SsisExecution -ModuleName $script:moduleName -MockWith {
-            $obj = [PSCustomObject]@{ Id = 55; Status = 'Succeeded' }
+            $obj = [PSCustomObject]@{ Id = 55; Status = 'Success' }
             $obj.PSObject.TypeNames.Insert(0, 'Ssis.Execution')
             $obj
         }
@@ -58,7 +58,7 @@ Describe 'Start-SsisExecution' {
 
     It 'With -Synchronous, delegates to Wait-SsisExecution and returns the completed execution' {
         $result = Start-SsisExecution -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -Synchronous -Confirm:$false
-        $result.Status | Should -Be 'Succeeded'
+        $result.Status | Should -Be 'Success'
         Should -Invoke -CommandName Wait-SsisExecution -ModuleName $script:moduleName -Times 1 -Scope It
     }
 

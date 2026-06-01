@@ -1,4 +1,4 @@
-BeforeAll {
+﻿BeforeAll {
     $script:moduleName = 'IntegrationServicesTools'
     Import-Module -Name $script:moduleName -Force -ErrorAction Stop
 }
@@ -18,7 +18,7 @@ Describe 'Wait-SsisExecution' {
         Mock -CommandName Get-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
             [PSCustomObject]@{ Id = 7; Status = 'Running' }
         }
-        $script:statuses = @('Running', 'Running', 'Succeeded')
+        $script:statuses = @('Running', 'Running', 'Success')
         $script:callIndex = 0
         Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
             $status = $script:statuses[$script:callIndex]
@@ -27,7 +27,7 @@ Describe 'Wait-SsisExecution' {
         }
 
         $result = Wait-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 7 -PollInterval 1
-        $result.Status | Should -Be 'Succeeded'
+        $result.Status | Should -Be 'Success'
         $result.PSObject.TypeNames | Should -Contain 'Ssis.Execution'
         Should -Invoke -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -Times 3 -Scope It
         Should -Invoke -CommandName Start-Sleep -ModuleName $script:moduleName -Times 2 -Scope It
@@ -67,14 +67,14 @@ Describe 'Wait-SsisExecution' {
     Context 'ByObject' {
         It 'Waits on a piped execution without reconnecting' {
             Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
-                [PSCustomObject]@{ Id = 7; Status = 'Succeeded' }
+                [PSCustomObject]@{ Id = 7; Status = 'Success' }
             }
 
             $execution = [PSCustomObject]@{ Id = 7; Status = 'Running' }
             $execution.PSObject.TypeNames.Insert(0, 'Ssis.Execution')
 
             $result = $execution | Wait-SsisExecution -PollInterval 1
-            $result.Status | Should -Be 'Succeeded'
+            $result.Status | Should -Be 'Success'
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
         }
     }

@@ -1,4 +1,4 @@
-function Wait-SsisExecution
+﻿function Wait-SsisExecution
 {
     <#
         .SYNOPSIS
@@ -6,7 +6,7 @@ function Wait-SsisExecution
 
         .DESCRIPTION
             Polls an execution, refreshing it every -PollInterval seconds, until its status becomes
-            terminal (Succeeded, Failed, Cancelled, EndedUnexpectedly or Completed), then returns the
+            terminal (Success, Failed, Canceled, UnexpectTerminated or Completion), then returns the
             completed Ssis.Execution. When -Timeout is greater than zero and the wait exceeds it, a
             non-terminating error is written and the still-running execution is returned, so callers
             can escalate with -ErrorAction Stop or inspect the returned Status. Accepts an execution by
@@ -80,7 +80,7 @@ function Wait-SsisExecution
 
     process
     {
-        $terminalStates = @('Succeeded', 'Failed', 'Cancelled', 'EndedUnexpectedly', 'Completed')
+        $terminalStates = @('Success', 'Failed', 'Canceled', 'UnexpectTerminated', 'Completion')
 
         if ($PSCmdlet.ParameterSetName -eq 'ByObject')
         {
