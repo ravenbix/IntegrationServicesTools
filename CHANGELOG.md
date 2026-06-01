@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   meaningful parameter combination (including `-SqlCredential` pass-through, pipeline/ByObject
   input, and `-WhatIf` gating on state-changers), plus added branch coverage for the pure private
   helpers (e.g. `ConvertTo-SsisTypeCode`, `Add-SsisTypeName`).
+- Community-health files: a `SECURITY.md` security policy (report vulnerabilities privately
+  through GitHub's private vulnerability reporting) and a Contributor Covenant v2.1
+  `CODE_OF_CONDUCT.md`.
+- README: a Motivation section, a Supported SQL Server versions table (2012-2025), and
+  Code of Conduct and Security links.
 
 ### Fixed
 
@@ -63,6 +68,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The generated README command reference now renders as a Markdown table per command group
+  (previously a bulleted list); synopsis cells escape any literal pipe character.
 - New-SsisCatalog keeps the catalog encryption password as a SecureString end-to-end, converting
   to the plain string the object model requires only at the point of the call.
 
