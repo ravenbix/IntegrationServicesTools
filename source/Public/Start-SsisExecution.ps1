@@ -129,10 +129,12 @@ function Start-SsisExecution
         $Synchronous,
 
         [Parameter()]
+        [ValidateRange(1, [int]::MaxValue)]
         [int]
         $PollInterval = 5,
 
         [Parameter()]
+        [ValidateRange(0, [int]::MaxValue)]
         [int]
         $Timeout = 0
     )
