@@ -27,7 +27,7 @@ Author = 'orionpax'
 CompanyName = 'orionpax'
 
 # Copyright statement for this module
-Copyright = '(c) 2026 orionpax. All rights reserved.'
+Copyright = '(c) 2026 Hank Swart'
 
 # Description of the functionality provided by this module
 Description = 'IntegrationServicesTools'
@@ -98,13 +98,13 @@ PrivateData = @{
 
         Prerelease =  ''
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('SSIS', 'SSISDB', 'IntegrationServices', 'SQLServer', 'ETL', 'PSEdition_Desktop')
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri = 'https://github.com/ravenbix/IntegrationServicesTools/blob/main/LICENSE'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/ravenbix/IntegrationServicesTools'
 
         # A URL to an icon representing this module.
         # IconUri = ''
