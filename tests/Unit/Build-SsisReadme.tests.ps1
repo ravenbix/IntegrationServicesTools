@@ -48,6 +48,27 @@ Describe 'Get-SsisReadmeVerbRank' {
     }
 }
 
+Describe 'Get-SsisReadmeCommandInfo' {
+    It 'returns the source file path it parsed' {
+        $infoDir = Join-Path -Path $TestDrive -ChildPath 'InfoSource'
+        New-Item -Path $infoDir -ItemType Directory -Force | Out-Null
+        $infoPath = Join-Path $infoDir 'Get-SsisCatalog.ps1'
+        Set-Content -Path $infoPath -Encoding UTF8 -Value @'
+function Get-SsisCatalog
+{
+    <#
+        .SYNOPSIS
+            Gets the catalog.
+    #>
+    [CmdletBinding()]
+    param ()
+}
+'@
+        $info = Get-SsisReadmeCommandInfo -Path $infoPath
+        $info.Path | Should -BeExactly $infoPath
+    }
+}
+
 Describe 'ConvertTo-SsisReadme' {
     BeforeAll {
         $script:sourceDir = Join-Path -Path $TestDrive -ChildPath 'Public'
@@ -112,7 +133,18 @@ MIT
 
     It 'renders each command as a Markdown table row' {
         $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $script:sourceDir
-        $result | Should -Match '\| \*\*Get-SsisFolder\*\* \| Gets folders\. \|'
+        $result | Should -Match '\| \*\*\[Get-SsisFolder\]\(Public/Get-SsisFolder\.ps1\)\*\* \| Gets folders\. \|'
+    }
+
+    It 'links each command name to its public source file' {
+        $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $script:sourceDir
+        $result | Should -Match '\[New-SsisCatalog\]\(Public/New-SsisCatalog\.ps1\)'
+        $result | Should -Match '\[Set-SsisEnvironmentVariable\]\(Public/Set-SsisEnvironmentVariable\.ps1\)'
+    }
+
+    It 'uses forward slashes in the source-file link' {
+        $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $script:sourceDir
+        $result | Should -Not -Match 'Public\\Get-SsisFolder\.ps1'
     }
 
     It 'emits a table header for each command group' {
@@ -137,7 +169,7 @@ function Get-SsisThing
 }
 '@
         $result = ConvertTo-SsisReadme -TemplatePath $script:templatePath -SourcePath $pipeDir
-        $result | Should -Match '\| \*\*Get-SsisThing\*\* \| Returns A \\\| B\. \|'
+        $result | Should -Match '\| \*\*\[Get-SsisThing\]\(PipeSource/Get-SsisThing\.ps1\)\*\* \| Returns A \\\| B\. \|'
     }
 
     It 'preserves the surrounding template prose' {
