@@ -258,6 +258,8 @@ function Start-SsisValidation
 
         $operationId = Start-SsisValidationObject @splatValidate
 
+        # ByObject left the catalog unresolved: walk up from the project (project.Parent = folder,
+        # folder.Parent = catalog). Two hops, vs Start-SsisExecution's three from the package.
         if ($null -eq $catalog)
         {
             $catalog = $projectObject.Parent.Parent

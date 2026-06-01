@@ -92,6 +92,12 @@ Describe 'Start-SsisValidation' {
         Should -Invoke -CommandName Start-SsisValidationObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
+    It 'Warns and does not validate when the project does not exist' {
+        Mock -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = Start-SsisValidation -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Missing' -Confirm:$false -WarningAction SilentlyContinue
+        Should -Invoke -CommandName Start-SsisValidationObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
     Context 'ByObject' {
         It 'Validates a piped project without reconnecting (target is the project)' {
             $project = [PSCustomObject]@{
