@@ -157,6 +157,10 @@ PSScriptAnalyzer runs with the module imported**. Do not revert it to a scriptbl
 - **Integration** (`tests/Integration/...`, tag `Integration`, opt-in): run against a real SQL
   Server with SSISDB; gate on `$env:SSIS_TEST_INSTANCE` and skip cleanly when unset. LocalDB cannot
   host SSISDB.
+- **Binary test data exception.** `tests/Integration/fixtures/*.ispac` are committed `.ispac` build
+  artifacts used to exercise project deploy/export. They are sanctioned **test data** — the
+  "never commit binaries" rule targets the MOM/assemblies, not test fixtures. The project
+  integration test self-skips when the fixture is absent.
 - **QA** (`tests/QA`): help quality, PSScriptAnalyzer, manifest correctness must pass.
   `PSUseOutputTypeCorrectly` is intentionally excluded in `tests/QA/module.tests.ps1` — it only
   activates once the SSIS assemblies are loaded and misfires on functions returning native MOM types.
