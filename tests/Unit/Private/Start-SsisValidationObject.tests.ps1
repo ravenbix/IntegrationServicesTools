@@ -38,8 +38,9 @@ Describe 'Start-SsisValidationObject' {
                 return [long] 1
             }
 
-            $null = Start-SsisValidationObject -Target $target -Reference $null -ReferenceUsage 'UseNoReference'
+            $result = Start-SsisValidationObject -Target $target -Reference $null -ReferenceUsage 'UseNoReference'
 
+            $result | Should -Be 1
             $target.Usage.ToString() | Should -Be 'UseNoReference'
             $target.Ref | Should -Be $null
         }
@@ -54,8 +55,9 @@ Describe 'Start-SsisValidationObject' {
                 return [long] 1
             }
 
-            $null = Start-SsisValidationObject -Target $target -Reference $null -ReferenceUsage 'UseAllReferences'
+            $result = Start-SsisValidationObject -Target $target -Reference $null -ReferenceUsage 'UseAllReferences'
 
+            $result | Should -Be 1
             $target.Use32 | Should -BeFalse
         }
     }
