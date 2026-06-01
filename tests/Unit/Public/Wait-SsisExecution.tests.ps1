@@ -59,6 +59,11 @@ Describe 'Wait-SsisExecution' {
             Should -Throw
     }
 
+    It 'Rejects a PollInterval below 1' {
+        { Wait-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 7 -PollInterval 0 } |
+            Should -Throw
+    }
+
     Context 'ByObject' {
         It 'Waits on a piped execution without reconnecting' {
             Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {

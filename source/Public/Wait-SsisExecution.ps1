@@ -68,10 +68,12 @@ function Wait-SsisExecution
         $InputObject,
 
         [Parameter()]
+        [ValidateRange(1, [int]::MaxValue)]
         [int]
         $PollInterval = 5,
 
         [Parameter()]
+        [ValidateRange(0, [int]::MaxValue)]
         [int]
         $Timeout = 0
     )
@@ -126,7 +128,7 @@ function Wait-SsisExecution
 
             if ($Timeout -gt 0 -and $elapsed -ge $Timeout)
             {
-                Write-Error -Message ('Timed out after {0} seconds waiting for execution ''{1}''; current status is ''{2}''.' -f $Timeout, $execution.Id, $execution.Status)
+                Write-Error -Message ('Timed out after about {0} seconds (limit {1}) waiting for execution ''{2}''; current status is ''{3}''.' -f $elapsed, $Timeout, $execution.Id, $execution.Status)
                 $execution | Add-SsisTypeName -TypeName 'Ssis.Execution'
                 return
             }
