@@ -84,7 +84,7 @@ Get-SsisProject -SqlInstance $instance -Folder 'Finance'
 
 ## Command reference
 
-IntegrationServicesTools exposes 23 commands.
+IntegrationServicesTools exposes 24 commands.
 
 ### Catalog
 - **Get-SsisCatalog** — Gets the SSISDB catalog from a SQL Server instance.
@@ -120,6 +120,9 @@ IntegrationServicesTools exposes 23 commands.
 ### Parameter
 - **Get-SsisParameter** — Gets parameters from a project or package in the SSISDB catalog.
 - **Set-SsisParameter** — Sets the value of a project or package parameter in the SSISDB catalog.
+
+### Execution
+- **Get-SsisExecution** — Gets package executions from the SSISDB catalog on a SQL Server instance.
 
 ## Usage examples
 
