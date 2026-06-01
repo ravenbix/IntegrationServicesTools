@@ -14,3 +14,8 @@
 *.dll binary
 *.so  binary
 *.ispac binary
+
+# README.md is generated with LF endings (and its template authored LF) so that
+# regeneration is byte-identical to the committed copy under core.autocrlf=true.
+README.md          text eol=lf
+README.template.md text eol=lf
