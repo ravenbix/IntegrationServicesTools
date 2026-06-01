@@ -49,6 +49,8 @@ BuildWorkflow:
     - Clean
     - Build_Module_ModuleBuilder
     - Build_NestedModules_ModuleBuilder
+    - Generate_Readme
+    - Assert_Readme_Clean
     - Create_changelog_release_output
 
 

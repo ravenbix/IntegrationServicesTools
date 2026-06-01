@@ -82,44 +82,7 @@ Get-SsisProject -SqlInstance $instance -Folder 'Finance'
 - **ShouldProcess.** State-changing commands support `-WhatIf`/`-Confirm`; `Remove-*` commands are
   high-impact and prompt by default.
 
-## Command reference
-
-IntegrationServicesTools exposes 23 commands.
-
-### Catalog
-- **Get-SsisCatalog** — Gets the SSISDB catalog from a SQL Server instance.
-- **New-SsisCatalog** — Creates the SSISDB catalog on a SQL Server instance.
-- **Set-SsisCatalog** — Configures properties of the SSISDB catalog on a SQL Server instance.
-
-### Folder
-- **Get-SsisFolder** — Gets folders from the SSISDB catalog on a SQL Server instance.
-- **New-SsisFolder** — Creates a folder in the SSISDB catalog on a SQL Server instance.
-- **Set-SsisFolder** — Updates the description of a folder in the SSISDB catalog.
-- **Remove-SsisFolder** — Removes a folder from the SSISDB catalog on a SQL Server instance.
-
-### Project
-- **Get-SsisProject** — Gets projects from the SSISDB catalog on a SQL Server instance.
-- **Publish-SsisProject** — Deploys an .ispac project into a folder of the SSISDB catalog.
-- **Export-SsisProject** — Exports an SSISDB project to an .ispac file on disk.
-- **Remove-SsisProject** — Removes a project from a folder in the SSISDB catalog.
-
-### Package
-- **Get-SsisPackage** — Gets packages from projects in the SSISDB catalog on a SQL Server instance.
-
-### Environment
-- **Get-SsisEnvironment** — Gets environments from the SSISDB catalog on a SQL Server instance.
-- **Get-SsisEnvironmentReference** — Gets the environment references defined on an SSISDB project.
-- **Get-SsisEnvironmentVariable** — Gets variables from an environment in the SSISDB catalog on a SQL Server instance.
-- **New-SsisEnvironment** — Creates an environment in a folder of the SSISDB catalog.
-- **New-SsisEnvironmentReference** — Creates an environment reference from an SSISDB project to an environment.
-- **Set-SsisEnvironmentVariable** — Adds or updates a variable on an SSISDB environment.
-- **Remove-SsisEnvironment** — Removes an environment from the SSISDB catalog on a SQL Server instance.
-- **Remove-SsisEnvironmentReference** — Removes an environment reference from an SSISDB project.
-- **Remove-SsisEnvironmentVariable** — Removes a variable from an SSISDB environment on a SQL Server instance.
-
-### Parameter
-- **Get-SsisParameter** — Gets parameters from a project or package in the SSISDB catalog.
-- **Set-SsisParameter** — Sets the value of a project or package parameter in the SSISDB catalog.
+<!-- SSIS:COMMANDS -->
 
 ## Usage examples
 
