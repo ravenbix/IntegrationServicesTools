@@ -47,6 +47,15 @@ Describe 'Get-SsisOperation' {
         $result[1].Id | Should -Be 2
     }
 
+    It 'Applies -Status then -Top together, newest matching first' {
+        Mock -CommandName Get-SsisOperationObject -ModuleName $script:moduleName -MockWith { $script:allOps }
+
+        $result = Get-SsisOperation -SqlInstance 'TestInstance' -Status 'Success' -Top 1
+        ($result | Measure-Object).Count | Should -Be 1
+        $result[0].Id | Should -Be 3
+        $result[0].Status | Should -Be 'Success'
+    }
+
     It 'Warns and returns nothing when the catalog does not exist' {
         Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
         $result = Get-SsisOperation -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
