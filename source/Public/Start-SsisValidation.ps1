@@ -25,6 +25,70 @@ function Start-SsisValidation
 
             Validates one package against the Prod environment reference and waits for the result.
 
+        .EXAMPLE
+            Start-SsisValidation -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -NoReference -Confirm:$false
+
+            Validates the project while ignoring all environment references (UseNoReference).
+
+        .EXAMPLE
+            $splatValidation = @{
+                SqlInstance       = 'SQL01\PROD'
+                Folder            = 'Finance'
+                Project           = 'Sales'
+                EnvironmentName   = 'Prod'
+                EnvironmentFolder = 'Shared'
+                Confirm           = $false
+            }
+            Start-SsisValidation @splatValidation
+
+            Validates against the 'Prod' environment reference that points at the 'Shared' folder,
+            disambiguating when several references share the name 'Prod'.
+
+        .EXAMPLE
+            Start-SsisValidation -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Use32BitRuntime -Confirm:$false
+
+            Validates the project in the 32-bit runtime, for packages needing a 32-bit provider or
+            driver.
+
+        .EXAMPLE
+            $splatSyncValidation = @{
+                SqlInstance  = 'SQL01\PROD'
+                Folder       = 'Finance'
+                Project      = 'Sales'
+                Synchronous  = $true
+                PollInterval = 2
+                Timeout      = 60
+                Confirm      = $false
+            }
+            Start-SsisValidation @splatSyncValidation
+
+            Validates the project and waits up to 60 seconds for it to finish, refreshing status every
+            2 seconds.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            $splatCredValidation = @{
+                SqlInstance   = 'SQL01\PROD'
+                SqlCredential = $cred
+                Folder        = 'Finance'
+                Project       = 'Sales'
+                Confirm       = $false
+            }
+            Start-SsisValidation @splatCredValidation
+
+            Connects with SQL Server authentication using the supplied credential and validates the
+            project.
+
+        .EXAMPLE
+            Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' | Start-SsisValidation -Confirm:$false
+
+            Pipes a project in (the ByObject parameter set) and validates it without reconnecting.
+
+        .EXAMPLE
+            Start-SsisValidation -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -WhatIf
+
+            Shows what would be validated without starting the validation operation.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

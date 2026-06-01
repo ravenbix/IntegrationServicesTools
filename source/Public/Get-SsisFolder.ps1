@@ -13,7 +13,32 @@ function Get-SsisFolder
         .EXAMPLE
             Get-SsisFolder -SqlInstance 'SQL01\PROD'
 
-            Returns every folder in the SSISDB catalog on the named instance.
+            Returns every folder in the SSISDB catalog on the named instance, using the current
+            Windows identity (integrated authentication).
+
+        .EXAMPLE
+            Get-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance'
+
+            Returns just the 'Finance' folder. Writes a warning and returns nothing when no folder
+            of that name exists in the catalog.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisFolder -SqlInstance 'SQL01\PROD' -SqlCredential $cred
+
+            Connects with SQL Server authentication using the supplied credential and returns every
+            folder in the catalog.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisFolder -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Name 'Finance'
+
+            Connects with SQL Server authentication and returns only the 'Finance' folder.
+
+        .EXAMPLE
+            'SQL01\PROD', 'SQL02\PROD' | Get-SsisFolder
+
+            Pipes instance names in and returns the folders from each instance's catalog in turn.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

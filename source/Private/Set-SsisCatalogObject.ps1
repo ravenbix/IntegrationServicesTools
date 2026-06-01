@@ -14,6 +14,15 @@ function Set-SsisCatalogObject
 
             Sets MaxProjectVersions to 5 and persists the change.
 
+        .EXAMPLE
+            $splatProperty = @{
+                OperationLogRetentionTime = 365
+                OperationCleanupEnabled   = $true
+            }
+            Set-SsisCatalogObject -Catalog $catalog -Property $splatProperty
+
+            Sets several catalog properties in one call before persisting them with a single Alter().
+
         .PARAMETER Catalog
             The Catalog object to modify, as returned by Get-SsisCatalogObject.
 

@@ -12,7 +12,30 @@ function Remove-SsisFolder
         .EXAMPLE
             Remove-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance'
 
-            Removes the Finance folder from the SSISDB catalog on the named instance.
+            Removes the Finance folder from the SSISDB catalog on the named instance, prompting for
+            confirmation first.
+
+        .EXAMPLE
+            Remove-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' -Confirm:$false
+
+            Removes the Finance folder without prompting for confirmation.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Remove-SsisFolder -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Name 'Finance' -Confirm:$false
+
+            Connects with SQL Server authentication using the supplied credential and removes the
+            Finance folder without prompting.
+
+        .EXAMPLE
+            Remove-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' -WhatIf
+
+            Reports what would happen without removing the folder.
+
+        .EXAMPLE
+            'SQL01\PROD', 'SQL02\PROD' | Remove-SsisFolder -Name 'Finance' -Confirm:$false
+
+            Pipes instance names in and removes the Finance folder from each instance's catalog in turn.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

@@ -14,6 +14,12 @@ function Get-SsisCatalogObject
 
             Returns the SSISDB catalog object, or $null when it does not exist.
 
+        .EXAMPLE
+            $catalog = Get-SsisCatalogObject -IntegrationServices $integrationServices -Name 'SSISDB'
+
+            Looks up a catalog by an explicit name. 'SSISDB' is the default, so this is only needed
+            in the unusual case of a non-standard catalog name.
+
         .PARAMETER IntegrationServices
             The IntegrationServices object (from Connect-SsisCatalog) representing the target server.
 

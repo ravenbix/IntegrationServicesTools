@@ -31,6 +31,18 @@ Describe 'Get-SsisCatalog' {
             $null = Get-SsisCatalog -SqlInstance 'TestInstance' -SqlCredential $cred
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -ParameterFilter { $SqlCredential.UserName -eq 'sa' } -Times 1 -Scope It
         }
+
+        It 'Accepts the instance from the pipeline' {
+            $result = 'TestInstance' | Get-SsisCatalog
+            ($result | Measure-Object).Count | Should -Be 1
+            $result.PSObject.TypeNames | Should -Contain 'Ssis.Catalog'
+        }
+
+        It 'Processes each instance piped in turn' {
+            $result = 'SQL01', 'SQL02' | Get-SsisCatalog
+            ($result | Measure-Object).Count | Should -Be 2
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 2 -Scope It
+        }
     }
 
     Context 'When the catalog does not exist' {

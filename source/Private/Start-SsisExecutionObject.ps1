@@ -16,6 +16,24 @@
 
             Starts the package with Basic logging bound to the given environment reference.
 
+        .EXAMPLE
+            $id = Start-SsisExecutionObject -Package $package -Reference $null
+
+            Starts the package with no environment reference, no parameter overrides and the default
+            64-bit runtime, returning its execution id.
+
+        .EXAMPLE
+            $splatStart = @{
+                Package         = $package
+                Reference       = $null
+                Parameter       = @{ TargetPort = 1450 }
+                Use32BitRuntime = $true
+            }
+            $id = Start-SsisExecutionObject @splatStart
+
+            Starts the package in the 32-bit runtime with a parameter override (resolved to object
+            type 30 for a package parameter, 20 for a project parameter).
+
         .PARAMETER Package
             The SSISDB PackageInfo object to execute, as returned by Get-SsisPackageObject.
 

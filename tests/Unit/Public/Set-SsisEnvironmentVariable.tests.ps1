@@ -30,6 +30,37 @@ Describe 'Set-SsisEnvironmentVariable' {
         Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $TypeCode -eq [System.TypeCode]::Int32 }
     }
 
+    It 'Infers a Boolean type code from a boolean value' {
+        $null = Set-SsisEnvironmentVariable -SqlInstance 'TestInstance' -Folder 'Finance' -Environment 'Prod' -Name 'Enabled' -Value $true -Confirm:$false
+        Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $Name -eq 'Enabled' -and $TypeCode -eq [System.TypeCode]::Boolean -and $Value -eq $true
+        }
+    }
+
+    It 'Infers a String type code for a null value' {
+        $null = Set-SsisEnvironmentVariable -SqlInstance 'TestInstance' -Folder 'Finance' -Environment 'Prod' -Name 'Optional' -Value $null -Confirm:$false
+        Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $TypeCode -eq [System.TypeCode]::String -and $null -eq $Value
+        }
+    }
+
+    It 'Applies -DataType and -Description together' {
+        $splatSetVariable = @{
+            SqlInstance = 'TestInstance'
+            Folder      = 'Finance'
+            Environment = 'Prod'
+            Name        = 'Port'
+            Value       = '1433'
+            DataType    = 'Int32'
+            Description = 'db port'
+            Confirm     = $false
+        }
+        $null = Set-SsisEnvironmentVariable @splatSetVariable
+        Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $TypeCode -eq [System.TypeCode]::Int32 -and $Description -eq 'db port'
+        }
+    }
+
     It 'Passes -Sensitive through to the interop wrapper' {
         $null = Set-SsisEnvironmentVariable -SqlInstance 'TestInstance' -Folder 'Finance' -Environment 'Prod' -Name 'Password' -Value 'secret' -Sensitive -Confirm:$false
         Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Sensitive -eq $true }
@@ -78,6 +109,25 @@ Describe 'Set-SsisEnvironmentVariable' {
             $null = $environment | Set-SsisEnvironmentVariable -Name 'Port' -Value 1433 -Confirm:$false
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Environment.Name -eq 'Prod' }
+        }
+
+        It 'Sets a sensitive variable with an explicit -DataType on a piped environment without connecting' {
+            $environment = [PSCustomObject]@{ Name = 'Prod' }
+            $environment.PSObject.TypeNames.Insert(0, 'Ssis.Environment')
+
+            $null = $environment | Set-SsisEnvironmentVariable -Name 'Password' -Value 'secret' -DataType 'String' -Sensitive -Confirm:$false
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+                $Environment.Name -eq 'Prod' -and $Name -eq 'Password' -and $TypeCode -eq [System.TypeCode]::String -and $Sensitive -eq $true
+            }
+        }
+
+        It 'Supports -WhatIf on a piped environment and does not set' {
+            $environment = [PSCustomObject]@{ Name = 'Prod' }
+            $environment.PSObject.TypeNames.Insert(0, 'Ssis.Environment')
+
+            $null = $environment | Set-SsisEnvironmentVariable -Name 'Port' -Value 1433 -WhatIf
+            Should -Invoke -CommandName Set-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
         }
     }
 }

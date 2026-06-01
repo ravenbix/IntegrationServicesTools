@@ -22,6 +22,36 @@ function Set-SsisParameter
 
             Binds the TargetPort parameter to the Port environment variable.
 
+        .EXAMPLE
+            Set-SsisParameter -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -Name 'BatchSize' -Value 500
+
+            Sets the BatchSize parameter of the Load.dtsx package (rather than a project-level parameter)
+            to the literal value 500.
+
+        .EXAMPLE
+            Set-SsisParameter -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'TargetPort' -Value $null
+
+            Sets the TargetPort parameter to a literal null value. -Value accepts null, so this is a
+            valid literal assignment, distinct from omitting -Value (which is an error).
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Set-SsisParameter -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Project 'Sales' -Name 'TargetPort' -Value 1450 -Confirm:$false
+
+            Connects with SQL Server authentication and sets the TargetPort parameter without prompting
+            for confirmation (Set-SsisParameter supports ShouldProcess at a Low ConfirmImpact).
+
+        .EXAMPLE
+            Set-SsisParameter -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'TargetPort' -Value 1450 -WhatIf
+
+            Reports what would be set without making any change.
+
+        .EXAMPLE
+            Get-SsisParameter -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'TargetPort' | Set-SsisParameter -Value 1450
+
+            Sets the piped TargetPort parameter to 1450 without reconnecting, reaching the owning project
+            through the parameter's Parent.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

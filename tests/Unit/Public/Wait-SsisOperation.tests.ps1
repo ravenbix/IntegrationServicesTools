@@ -59,6 +59,36 @@ Describe 'Wait-SsisOperation' {
             Should -Throw
     }
 
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        Mock -CommandName Get-SsisOperationObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 9; Status = 'Running' }
+        }
+        Mock -CommandName Update-SsisOperationObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 9; Status = 'Success' }
+        }
+
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = Wait-SsisOperation -SqlInstance 'TestInstance' -SqlCredential $credential -OperationId 9 -PollInterval 1
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Returns immediately without sleeping when already terminal, even with a -Timeout set' {
+        Mock -CommandName Get-SsisOperationObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 9; Status = 'Running' }
+        }
+        Mock -CommandName Update-SsisOperationObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 9; Status = 'Success' }
+        }
+
+        $result = Wait-SsisOperation -SqlInstance 'TestInstance' -OperationId 9 -PollInterval 1 -Timeout 30
+        $result.Status | Should -Be 'Success'
+        Should -Invoke -CommandName Start-Sleep -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
     It 'Warns and returns nothing when the operation is absent' {
         Mock -CommandName Get-SsisOperationObject -ModuleName $script:moduleName -MockWith { $null }
         $result = Wait-SsisOperation -SqlInstance 'TestInstance' -OperationId 404 -WarningAction SilentlyContinue

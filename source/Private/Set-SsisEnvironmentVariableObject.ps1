@@ -13,7 +13,22 @@ function Set-SsisEnvironmentVariableObject
         .EXAMPLE
             Set-SsisEnvironmentVariableObject -Environment $environment -Name 'Port' -Value 1433 -TypeCode ([System.TypeCode]::Int32) -Sensitive $false -Description 'db port'
 
-            Adds or updates the Port variable and alters the environment to persist it.
+            Adds the Port variable (create branch) when it does not yet exist and alters the
+            environment to persist it.
+
+        .EXAMPLE
+            $splatSetVariable = @{
+                Environment = $environment
+                Name        = 'Port'
+                Value       = 'localhost'
+                TypeCode    = [System.TypeCode]::String
+                Sensitive   = $true
+                Description = 'db host'
+            }
+            Set-SsisEnvironmentVariableObject @splatSetVariable
+
+            Updates the existing Port variable in place (update branch), retyping it to String,
+            marking it sensitive, and altering the environment to persist the change.
 
         .PARAMETER Environment
             The SSISDB EnvironmentInfo object whose variable to add or update.

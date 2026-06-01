@@ -71,4 +71,21 @@ Describe 'Publish-SsisProject' {
         Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
         Should -Invoke -CommandName Publish-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Folder.Name -eq 'Finance' -and $Name -eq 'Sales' }
     }
+
+    It 'Uses -Name to override the project name when deploying into a piped folder (ByObject + Name)' {
+        $folder = [PSCustomObject]@{ Name = 'Finance' }
+        $folder.PSObject.TypeNames.Insert(0, 'Ssis.Folder')
+
+        $null = $folder | Publish-SsisProject -Path 'C:\out\Sales.ispac' -Name 'Renamed' -Confirm:$false
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName Publish-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Folder.Name -eq 'Finance' -and $Name -eq 'Renamed' }
+    }
+
+    It 'Supports -WhatIf for a piped folder and does not deploy (ByObject + WhatIf)' {
+        $folder = [PSCustomObject]@{ Name = 'Finance' }
+        $folder.PSObject.TypeNames.Insert(0, 'Ssis.Folder')
+
+        $null = $folder | Publish-SsisProject -Path 'C:\out\Sales.ispac' -WhatIf
+        Should -Invoke -CommandName Publish-SsisProjectObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
 }

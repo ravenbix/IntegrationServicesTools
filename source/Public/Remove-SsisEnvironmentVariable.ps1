@@ -16,6 +16,30 @@ function Remove-SsisEnvironmentVariable
             Removes the Port variable from the Prod environment in the Finance folder.
 
         .EXAMPLE
+            Remove-SsisEnvironmentVariable -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Environment 'Prod' -Name 'Port' -Confirm:$false
+
+            Removes the Port variable without prompting for confirmation.
+
+        .EXAMPLE
+            Remove-SsisEnvironmentVariable -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Environment 'Prod' -Name 'Port' -WhatIf
+
+            Shows what would be removed without making any change.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            $splatRemoveVariable = @{
+                SqlInstance   = 'SQL01\PROD'
+                SqlCredential = $cred
+                Folder        = 'Finance'
+                Environment   = 'Prod'
+                Name          = 'Port'
+            }
+            Remove-SsisEnvironmentVariable @splatRemoveVariable
+
+            Connects with SQL Server authentication using the supplied credential and removes the Port
+            variable.
+
+        .EXAMPLE
             Get-SsisEnvironmentVariable -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Environment 'Prod' -Name 'Port' | Remove-SsisEnvironmentVariable
 
             Removes the piped Port variable via its parent environment.

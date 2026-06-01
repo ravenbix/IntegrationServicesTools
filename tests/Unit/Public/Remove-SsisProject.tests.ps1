@@ -42,6 +42,15 @@ Describe 'Remove-SsisProject' {
         Should -Invoke -CommandName Remove-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Project.Name -eq 'Sales' }
     }
 
+    It 'Supports -WhatIf for a piped project and does not drop (ByObject + WhatIf)' {
+        $project = [PSCustomObject]@{ Name = 'Sales' }
+        $project.PSObject.TypeNames.Insert(0, 'Ssis.Project')
+
+        $project | Remove-SsisProject -WhatIf
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName Remove-SsisProjectObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
     It 'Forwards the SqlCredential to Connect-SsisCatalog' {
         $cred = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString 'p@ss' -AsPlainText -Force))
         Remove-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -Name 'Sales' -SqlCredential $cred -Confirm:$false

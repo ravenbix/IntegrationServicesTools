@@ -13,12 +13,39 @@ function New-SsisEnvironment
         .EXAMPLE
             New-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' -Description 'Production'
 
-            Creates the Prod environment in the Finance folder on the named instance.
+            Creates the Prod environment in the Finance folder on the named instance, with a
+            description.
+
+        .EXAMPLE
+            New-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod'
+
+            Creates the Prod environment with no description (the default empty string when
+            -Description is omitted).
+
+        .EXAMPLE
+            New-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' -WhatIf
+
+            Reports that the Prod environment would be created without making any change, then
+            returns.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            New-SsisEnvironment -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Name 'Prod'
+
+            Connects with SQL Server authentication using the supplied credential and creates the
+            Prod environment in the Finance folder.
 
         .EXAMPLE
             Get-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' | New-SsisEnvironment -Name 'Prod'
 
-            Creates the Prod environment in the piped Finance folder.
+            Creates the Prod environment in the piped Finance folder (the ByObject parameter set,
+            reusing the folder's existing connection).
+
+        .EXAMPLE
+            Get-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' |
+                New-SsisEnvironment -Name 'Prod' -Description 'Production'
+
+            Creates the Prod environment with a description in the piped Finance folder.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

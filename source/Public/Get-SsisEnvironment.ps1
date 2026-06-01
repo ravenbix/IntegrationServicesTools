@@ -18,9 +18,35 @@ function Get-SsisEnvironment
             Returns the environments in the Finance folder on the named instance.
 
         .EXAMPLE
+            Get-SsisEnvironment -SqlInstance 'SQL01\PROD'
+
+            Returns every environment across every folder in the catalog (the default ByInstance
+            scope when -Folder is omitted).
+
+        .EXAMPLE
+            Get-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod'
+
+            Returns just the Prod environment from the Finance folder. Writes a warning when no
+            environment of that name exists in the folder.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisEnvironment -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance'
+
+            Connects with SQL Server authentication using the supplied credential and returns the
+            environments in the Finance folder.
+
+        .EXAMPLE
             Get-SsisFolder -SqlInstance 'SQL01\PROD' | Get-SsisEnvironment
 
-            Returns every environment in every folder by piping folder objects in.
+            Returns every environment in every folder by piping folder objects in (the ByObject
+            parameter set, reusing each folder's existing connection).
+
+        .EXAMPLE
+            Get-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' | Get-SsisEnvironment -Name 'Prod'
+
+            Pipes the Finance folder in and returns only its Prod environment, reusing the folder's
+            connection. Writes a warning when no such environment exists.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

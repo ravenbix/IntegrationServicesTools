@@ -14,6 +14,29 @@ function Set-SsisFolder
 
             Updates the Finance folder's description on the named instance.
 
+        .EXAMPLE
+            Set-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' -Description ''
+
+            Clears the Finance folder's description by passing an empty string.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Set-SsisFolder -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Name 'Finance' -Description 'Updated'
+
+            Connects with SQL Server authentication using the supplied credential and updates the
+            Finance folder's description.
+
+        .EXAMPLE
+            Set-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' -Description 'Updated' -WhatIf
+
+            Reports what would happen without updating the folder.
+
+        .EXAMPLE
+            'SQL01\PROD', 'SQL02\PROD' | Set-SsisFolder -Name 'Finance' -Description 'Updated'
+
+            Pipes instance names in and updates the Finance folder's description on each instance's
+            catalog in turn.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

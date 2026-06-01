@@ -17,9 +17,38 @@ function Get-SsisParameter
             Returns the project-level parameters of the Sales project.
 
         .EXAMPLE
+            Get-SsisParameter -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'TargetPort'
+
+            Returns just the TargetPort project-level parameter. Writes a warning and returns nothing
+            when no parameter of that name exists.
+
+        .EXAMPLE
+            Get-SsisParameter -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx'
+
+            Returns the package-level parameters of the Load.dtsx package instead of the project-level
+            parameters.
+
+        .EXAMPLE
+            Get-SsisParameter -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -Name 'BatchSize'
+
+            Returns just the BatchSize parameter of the Load.dtsx package.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisParameter -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Project 'Sales'
+
+            Connects with SQL Server authentication using the supplied credential and returns the
+            project-level parameters of the Sales project.
+
+        .EXAMPLE
             Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' | Get-SsisParameter
 
             Returns the project-level parameters of the piped Sales project.
+
+        .EXAMPLE
+            Get-SsisPackage -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'Load.dtsx' | Get-SsisParameter -Name 'BatchSize'
+
+            Returns the BatchSize parameter of the piped Load.dtsx package without reconnecting.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

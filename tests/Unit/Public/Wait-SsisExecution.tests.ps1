@@ -64,6 +64,53 @@ Describe 'Wait-SsisExecution' {
             Should -Throw
     }
 
+    It 'Sleeps for the custom -PollInterval between refreshes' {
+        Mock -CommandName Get-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 7; Status = 'Running' }
+        }
+        $script:statuses = @('Running', 'Success')
+        $script:callIndex = 0
+        Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
+            $status = $script:statuses[$script:callIndex]
+            $script:callIndex++
+            [PSCustomObject]@{ Id = 7; Status = $status }
+        }
+
+        $result = Wait-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 7 -PollInterval 15
+        $result.Status | Should -Be 'Success'
+        Should -Invoke -CommandName Start-Sleep -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Seconds -eq 15 }
+    }
+
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        Mock -CommandName Get-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 7; Status = 'Running' }
+        }
+        Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 7; Status = 'Success' }
+        }
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = Wait-SsisExecution -SqlInstance 'TestInstance' -SqlCredential $credential -ExecutionId 7
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Warns and returns nothing when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+
+        $result = Wait-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 7 -WarningAction SilentlyContinue
+        $result | Should -BeNullOrEmpty
+    }
+
+    It 'Warns and returns nothing when the execution is not found' {
+        Mock -CommandName Get-SsisExecutionObject -ModuleName $script:moduleName -MockWith { $null }
+
+        $result = Wait-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 999 -WarningAction SilentlyContinue
+        $result | Should -BeNullOrEmpty
+    }
+
     Context 'ByObject' {
         It 'Waits on a piped execution without reconnecting' {
             Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
@@ -76,6 +123,21 @@ Describe 'Wait-SsisExecution' {
             $result = $execution | Wait-SsisExecution -PollInterval 1
             $result.Status | Should -Be 'Success'
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        }
+
+        It 'Times out on a piped execution when -Timeout elapses' {
+            Mock -CommandName Update-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
+                [PSCustomObject]@{ Id = 7; Status = 'Running' }
+            }
+
+            $execution = [PSCustomObject]@{ Id = 7; Status = 'Running' }
+            $execution.PSObject.TypeNames.Insert(0, 'Ssis.Execution')
+
+            $errors = @()
+            $result = $execution | Wait-SsisExecution -PollInterval 5 -Timeout 5 -ErrorVariable errors -ErrorAction SilentlyContinue
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            $result.Status | Should -Be 'Running'
+            $errors.Count | Should -BeGreaterThan 0
         }
     }
 }

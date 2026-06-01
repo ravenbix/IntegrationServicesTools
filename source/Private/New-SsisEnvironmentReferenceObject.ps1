@@ -15,6 +15,11 @@ function New-SsisEnvironmentReferenceObject
 
             Adds a relative reference from the project to the Prod environment in its own folder.
 
+        .EXAMPLE
+            New-SsisEnvironmentReferenceObject -Project $project -Environment 'Prod' -EnvironmentFolder 'Shared'
+
+            Adds an absolute reference from the project to the Prod environment in the Shared folder.
+
         .PARAMETER Project
             The SSISDB ProjectInfo object to add the environment reference to.
 

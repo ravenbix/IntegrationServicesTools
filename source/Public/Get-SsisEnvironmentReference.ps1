@@ -17,6 +17,13 @@ function Get-SsisEnvironmentReference
             Returns the environment references defined on the Sales project.
 
         .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Project 'Sales'
+
+            Connects with SQL Server authentication using the supplied credential and returns the
+            environment references of the Sales project.
+
+        .EXAMPLE
             Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' | Get-SsisEnvironmentReference
 
             Returns the environment references of the piped Sales project.

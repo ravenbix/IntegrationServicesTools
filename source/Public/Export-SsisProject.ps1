@@ -14,7 +14,40 @@ function Export-SsisProject
         .EXAMPLE
             Export-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' -Path 'C:\backup'
 
-            Writes C:\backup\Sales.ispac from the Sales project in the Finance folder.
+            Writes C:\backup\Sales.ispac from the Sales project in the Finance folder, using the
+            current Windows identity (integrated authentication).
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Export-SsisProject -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Name 'Sales' -Path 'C:\backup'
+
+            Connects with SQL Server authentication using the supplied credential and writes
+            C:\backup\Sales.ispac from the Sales project in the Finance folder.
+
+        .EXAMPLE
+            $splatExport = @{
+                SqlInstance = 'SQL01\PROD'
+                Folder      = 'Finance'
+                Name        = 'Sales'
+                Path        = 'C:\backup'
+                Force       = $true
+            }
+            Export-SsisProject @splatExport
+
+            Writes C:\backup\Sales.ispac, overwriting an existing file of that name. Without -Force
+            an existing target file causes an error and no write.
+
+        .EXAMPLE
+            Export-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' -Path 'C:\backup' -WhatIf
+
+            Reports the .ispac file that would be written without retrieving project content or
+            writing anything to disk.
+
+        .EXAMPLE
+            Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' | Export-SsisProject -Path 'C:\backup'
+
+            Pipes an Ssis.Project object in (ByObject) and exports it to C:\backup\Sales.ispac,
+            reusing the existing connection instead of reconnecting via -SqlInstance.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

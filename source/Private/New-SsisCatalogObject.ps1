@@ -14,6 +14,13 @@ function New-SsisCatalogObject
 
             Creates the SSISDB catalog and returns it.
 
+        .EXAMPLE
+            $securePassword = Read-Host -AsSecureString -Prompt 'Encryption password'
+            $catalog = New-SsisCatalogObject -IntegrationServices $is -Password $securePassword -Name 'SSISDB'
+
+            Passes the catalog name explicitly. 'SSISDB' is the default and the only name the SSIS
+            catalog supports, so -Name is rarely needed.
+
         .PARAMETER IntegrationServices
             The IntegrationServices object (from Connect-SsisCatalog) representing the target server.
 

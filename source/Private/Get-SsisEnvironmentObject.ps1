@@ -14,6 +14,12 @@ function Get-SsisEnvironmentObject
 
             Returns the Prod environment, or $null when it does not exist.
 
+        .EXAMPLE
+            $environments = Get-SsisEnvironmentObject -Folder $folder
+
+            Returns the folder's whole Environments collection (every environment) when -Name is
+            omitted.
+
         .PARAMETER Folder
             The SSISDB CatalogFolder object whose environments to read, as returned by Get-SsisFolderObject.
 

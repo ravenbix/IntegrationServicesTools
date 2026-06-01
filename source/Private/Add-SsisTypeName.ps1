@@ -15,6 +15,22 @@ function Add-SsisTypeName
 
             Tags the catalog object with the Ssis.Catalog type name and returns it.
 
+        .EXAMPLE
+            $folders | Add-SsisTypeName -TypeName 'Ssis.Folder'
+
+            Tags every folder streamed in from the pipeline with the Ssis.Folder type name, emitting
+            each decorated object as it is processed.
+
+        .EXAMPLE
+            Add-SsisTypeName -InputObject $project -TypeName 'Ssis.Project'
+
+            Tags a single object passed by the -InputObject parameter rather than the pipeline.
+
+        .EXAMPLE
+            $null | Add-SsisTypeName -TypeName 'Ssis.Catalog'
+
+            Passes a null input through unchanged; no type name is inserted and nothing throws.
+
         .PARAMETER InputObject
             The object to decorate. It is passed through unchanged apart from the inserted type name.
             A null value is passed through without modification.

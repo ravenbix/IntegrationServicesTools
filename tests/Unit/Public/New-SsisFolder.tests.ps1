@@ -38,4 +38,33 @@ Describe 'New-SsisFolder' {
         $null = New-SsisFolder -SqlInstance 'TestInstance' -Name 'Finance' -WhatIf
         Should -Invoke -CommandName New-SsisFolderObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
+
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = New-SsisFolder -SqlInstance 'TestInstance' -SqlCredential $credential -Name 'Finance'
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Creates with -Confirm:$false without prompting' {
+        $result = New-SsisFolder -SqlInstance 'TestInstance' -Name 'Finance' -Description 'Finance' -Confirm:$false
+        $result.Name | Should -Be 'Finance'
+        Should -Invoke -CommandName New-SsisFolderObject -ModuleName $script:moduleName -Exactly -Times 1 -Scope It
+    }
+
+    It 'Accepts the instance from the pipeline and creates the folder' {
+        $result = 'TestInstance' | New-SsisFolder -Name 'Finance' -Description 'Finance' -Confirm:$false
+        $result.PSObject.TypeNames | Should -Contain 'Ssis.Folder'
+        Should -Invoke -CommandName New-SsisFolderObject -ModuleName $script:moduleName -Exactly -Times 1 -Scope It
+    }
+
+    It 'Errors and does not create when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = New-SsisFolder -SqlInstance 'TestInstance' -Name 'Finance' -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName New-SsisFolderObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
 }

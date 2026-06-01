@@ -58,6 +58,63 @@ Describe 'Start-SsisValidation' {
         }
     }
 
+    It 'Disambiguates a named reference by -EnvironmentFolder' {
+        Mock -CommandName Get-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -MockWith {
+            @(
+                [PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = 'Finance' }
+                [PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = 'Shared' }
+            )
+        }
+
+        $splatEnvFolder = @{
+            SqlInstance       = 'TestInstance'
+            Folder            = 'Finance'
+            Project           = 'Sales'
+            EnvironmentName   = 'Prod'
+            EnvironmentFolder = 'Shared'
+            Confirm           = $false
+        }
+        $null = Start-SsisValidation @splatEnvFolder
+
+        Should -Invoke -CommandName Start-SsisValidationObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $ReferenceUsage -eq 'SpecifyReference' -and $Reference.EnvironmentFolderName -eq 'Shared'
+        }
+    }
+
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $splatCred = @{
+            SqlInstance   = 'TestInstance'
+            SqlCredential = $credential
+            Folder        = 'Finance'
+            Project       = 'Sales'
+            Confirm       = $false
+        }
+        $null = Start-SsisValidation @splatCred
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'With -Synchronous, forwards -PollInterval and -Timeout to Wait-SsisOperation' {
+        $splatSync = @{
+            SqlInstance  = 'TestInstance'
+            Folder       = 'Finance'
+            Project      = 'Sales'
+            Synchronous  = $true
+            PollInterval = 2
+            Timeout      = 60
+            Confirm      = $false
+        }
+        $null = Start-SsisValidation @splatSync
+
+        Should -Invoke -CommandName Wait-SsisOperation -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $PollInterval -eq 2 -and $Timeout -eq 60
+        }
+    }
+
     It 'Throws when both -EnvironmentName and -NoReference are given' {
         { Start-SsisValidation -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -EnvironmentName 'Prod' -NoReference -Confirm:$false } |
             Should -Throw

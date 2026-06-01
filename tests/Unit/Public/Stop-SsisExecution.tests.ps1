@@ -45,6 +45,24 @@ Describe 'Stop-SsisExecution' {
         Should -Invoke -CommandName Stop-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
+    It 'Errors and does not stop when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        $errors = @()
+        $null = Stop-SsisExecution -SqlInstance 'TestInstance' -ExecutionId 7 -Confirm:$false -ErrorVariable errors -ErrorAction SilentlyContinue
+        $errors.Count | Should -BeGreaterThan 0
+        Should -Invoke -CommandName Stop-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = Stop-SsisExecution -SqlInstance 'TestInstance' -SqlCredential $credential -ExecutionId 7 -Confirm:$false
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
     Context 'ByObject' {
         It 'Stops a piped execution without reconnecting' {
             $execution = [PSCustomObject]@{ Id = 7; Status = 'Running' }
@@ -53,6 +71,16 @@ Describe 'Stop-SsisExecution' {
             $null = $execution | Stop-SsisExecution -Confirm:$false
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Stop-SsisExecutionObject -ModuleName $script:moduleName -Times 1 -Scope It
+        }
+
+        It 'Stops a piped execution and returns it with -PassThru' {
+            $execution = [PSCustomObject]@{ Id = 7; Status = 'Running' }
+            $execution.PSObject.TypeNames.Insert(0, 'Ssis.Execution')
+
+            $result = $execution | Stop-SsisExecution -PassThru -Confirm:$false
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            $result.Status | Should -Be 'Canceled'
+            $result.PSObject.TypeNames | Should -Contain 'Ssis.Execution'
         }
     }
 }

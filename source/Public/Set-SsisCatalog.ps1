@@ -15,6 +15,34 @@ function Set-SsisCatalog
 
             Sets the maximum project versions and the operation-log retention window.
 
+        .EXAMPLE
+            Set-SsisCatalog -SqlInstance 'SQL01\PROD' -MaxProjectVersions 10
+
+            Changes only the maximum project versions, leaving every other catalog property as-is.
+
+        .EXAMPLE
+            Set-SsisCatalog -SqlInstance 'SQL01\PROD' -EncryptionAlgorithm 'AES_256'
+
+            Re-encrypts the catalog with the AES-256 algorithm. This can be slow on a large catalog.
+
+        .EXAMPLE
+            Set-SsisCatalog -SqlInstance 'SQL01\PROD' -OperationCleanupEnabled $true -VersionCleanupEnabled $false
+
+            Enables the periodic operation-cleanup job and disables the project-version-cleanup job.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Set-SsisCatalog -SqlInstance 'SQL01\PROD' -SqlCredential $cred -RetentionDays 90
+
+            Connects with SQL Server authentication and shortens the operation-log retention window
+            to 90 days.
+
+        .EXAMPLE
+            Set-SsisCatalog -SqlInstance 'SQL01\PROD' -MaxProjectVersions 5 -WhatIf
+
+            Reports what would change without altering the catalog. -Confirm prompts before applying
+            instead.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

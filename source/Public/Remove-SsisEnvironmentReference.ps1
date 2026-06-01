@@ -17,6 +17,26 @@ function Remove-SsisEnvironmentReference
             Removes the relative reference to the Prod environment from the Sales project.
 
         .EXAMPLE
+            Remove-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -EnvironmentFolder 'Shared'
+
+            Removes the absolute reference to the Prod environment in the Shared folder, rather than a
+            relative reference within the project's own folder.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Remove-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -Confirm:$false
+
+            Connects with SQL Server authentication and removes the relative reference to the Prod
+            environment without prompting for confirmation.
+
+        .EXAMPLE
+            Remove-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -WhatIf
+
+            Reports what would be removed without making any change. Because this command is a
+            destructive Remove with ConfirmImpact High, it prompts for confirmation unless -WhatIf or
+            -Confirm:$false is supplied.
+
+        .EXAMPLE
             Get-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' | Remove-SsisEnvironmentReference
 
             Removes each piped environment reference from its project.

@@ -15,12 +15,34 @@
         .EXAMPLE
             Wait-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42
 
-            Waits for execution 42 to finish and returns the completed execution.
+            Waits indefinitely for execution 42 to finish and returns the completed execution, polling
+            every five seconds (the default) using the current Windows identity.
+
+        .EXAMPLE
+            Wait-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42 -PollInterval 15
+
+            Waits for execution 42 to finish, refreshing its status every fifteen seconds instead of
+            the default five.
+
+        .EXAMPLE
+            $execution = Wait-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42 -Timeout 600 -ErrorAction SilentlyContinue
+            if ($execution.Status -ne 'Success') { 'still running or failed' }
+
+            Waits up to ten minutes; on timeout a non-terminating error is written and the still-running
+            execution is returned, so the caller can inspect its Status.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Wait-SsisExecution -SqlInstance 'SQL01\PROD' -SqlCredential $cred -ExecutionId 42 -Timeout 600 -ErrorAction Stop
+
+            Connects with SQL Server authentication and waits up to ten minutes, throwing a terminating
+            error if the execution has not finished by then.
 
         .EXAMPLE
             Start-SsisExecution -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' | Wait-SsisExecution -Timeout 600
 
-            Starts a package and waits up to ten minutes for it to finish.
+            Starts a package and waits up to ten minutes for it to finish, reusing the started
+            execution's connection.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

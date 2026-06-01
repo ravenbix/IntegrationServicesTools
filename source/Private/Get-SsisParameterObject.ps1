@@ -15,6 +15,16 @@ function Get-SsisParameterObject
 
             Returns the TargetPort project parameter, or $null when it does not exist.
 
+        .EXAMPLE
+            $parameters = Get-SsisParameterObject -Container $package
+
+            Returns every parameter on the package container when no -Name is given.
+
+        .EXAMPLE
+            $parameter = Get-SsisParameterObject -Container $project -Name 'Missing'
+
+            Returns $null because no parameter named 'Missing' exists on the container.
+
         .PARAMETER Container
             The SSISDB ProjectInfo or PackageInfo whose parameters to read. Both expose a Parameters
             collection.

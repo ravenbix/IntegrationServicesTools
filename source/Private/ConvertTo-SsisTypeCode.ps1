@@ -18,7 +18,30 @@ function ConvertTo-SsisTypeCode
         .EXAMPLE
             $typeCode = ConvertTo-SsisTypeCode -Value '5' -DataType 'Int32'
 
-            Returns [System.TypeCode]::Int32, forced by the explicit data type name.
+            Returns [System.TypeCode]::Int32, forced by the explicit data type name (inference from
+            the string value is overridden).
+
+        .EXAMPLE
+            $typeCode = ConvertTo-SsisTypeCode -Value 1 -DataType 'int64'
+
+            Returns [System.TypeCode]::Int64. The -DataType name is matched case-insensitively.
+
+        .EXAMPLE
+            $typeCode = ConvertTo-SsisTypeCode -Value $null
+
+            Returns [System.TypeCode]::String, the fallback used when the value is null and no
+            -DataType is supplied.
+
+        .EXAMPLE
+            $typeCode = ConvertTo-SsisTypeCode -Value $true
+
+            Returns [System.TypeCode]::Boolean, inferred from the .NET type of the supplied value.
+
+        .EXAMPLE
+            $typeCode = ConvertTo-SsisTypeCode -Value 42 -DataType ''
+
+            Returns [System.TypeCode]::Int32. An empty -DataType is treated as "not supplied", so
+            the type code is inferred from the value.
 
         .OUTPUTS
             System.TypeCode

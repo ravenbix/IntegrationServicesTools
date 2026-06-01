@@ -13,15 +13,96 @@ function Start-SsisExecution
             catalog, folder, project, package, or named environment reference does not exist.
 
         .EXAMPLE
-            Start-SsisExecution -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -Confirm:$false
+            $splatStart = @{
+                SqlInstance = 'SQL01\PROD'
+                Folder      = 'Finance'
+                Project     = 'Sales'
+                Package     = 'Load.dtsx'
+                Confirm     = $false
+            }
+            Start-SsisExecution @splatStart
 
-            Starts the package and returns the running execution.
+            Starts the package and returns the running execution, using the current Windows identity
+            (integrated authentication).
 
         .EXAMPLE
-            Start-SsisExecution -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -EnvironmentName 'Prod' -Parameter @{ TargetPort = 1450 } -LoggingLevel 'Basic' -Synchronous -Confirm:$false
+            $splatStart = @{
+                SqlInstance = 'SQL01\PROD'
+                Folder      = 'Finance'
+                Project     = 'Sales'
+                Package     = 'Load.dtsx'
+                WhatIf      = $true
+            }
+            Start-SsisExecution @splatStart
+
+            Shows what would happen (which package would be started) without actually starting any
+            execution.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            $splatStart = @{
+                SqlInstance   = 'SQL01\PROD'
+                SqlCredential = $cred
+                Folder        = 'Finance'
+                Project       = 'Sales'
+                Package       = 'Load.dtsx'
+                Confirm       = $false
+            }
+            Start-SsisExecution @splatStart
+
+            Connects with SQL Server authentication and starts the package.
+
+        .EXAMPLE
+            $splatStart = @{
+                SqlInstance     = 'SQL01\PROD'
+                Folder          = 'Finance'
+                Project         = 'Sales'
+                Package         = 'Load.dtsx'
+                Use32BitRuntime = $true
+                Confirm         = $false
+            }
+            Start-SsisExecution @splatStart
+
+            Starts the package in the 32-bit runtime (for a package needing a 32-bit provider or
+            driver).
+
+        .EXAMPLE
+            $splatStart = @{
+                SqlInstance       = 'SQL01\PROD'
+                Folder            = 'Finance'
+                Project           = 'Sales'
+                Package           = 'Load.dtsx'
+                EnvironmentName   = 'Prod'
+                EnvironmentFolder = 'Shared'
+                Confirm           = $false
+            }
+            Start-SsisExecution @splatStart
+
+            Starts the package bound to the 'Prod' environment reference that points at the 'Shared'
+            folder, disambiguating from any other reference of the same name.
+
+        .EXAMPLE
+            $splatStart = @{
+                SqlInstance     = 'SQL01\PROD'
+                Folder          = 'Finance'
+                Project         = 'Sales'
+                Package         = 'Load.dtsx'
+                EnvironmentName = 'Prod'
+                Parameter       = @{ TargetPort = 1450 }
+                LoggingLevel    = 'Basic'
+                Synchronous     = $true
+                Timeout         = 600
+                Confirm         = $false
+            }
+            Start-SsisExecution @splatStart
 
             Starts the package bound to the Prod environment with a parameter override and Basic logging,
-            then waits for it to finish.
+            then waits up to ten minutes for it to finish.
+
+        .EXAMPLE
+            Get-SsisPackage -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'Load.dtsx' | Start-SsisExecution -Confirm:$false
+
+            Starts a piped package, reusing the package's existing connection rather than reconnecting.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

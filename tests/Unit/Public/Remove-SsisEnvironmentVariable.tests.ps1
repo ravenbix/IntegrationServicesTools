@@ -55,6 +55,24 @@ Describe 'Remove-SsisEnvironmentVariable' {
             Remove-SsisEnvironmentVariable -SqlInstance 'TestInstance' -Folder 'Finance' -Environment 'Prod' -Name 'Port' -WhatIf
             Should -Invoke -CommandName Remove-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
         }
+
+        It 'Forwards the SqlCredential to Connect-SsisCatalog' {
+            $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+            $splatRemoveVariable = @{
+                SqlInstance   = 'TestInstance'
+                SqlCredential = $credential
+                Folder        = 'Finance'
+                Environment   = 'Prod'
+                Name          = 'Port'
+                Confirm       = $false
+            }
+            Remove-SsisEnvironmentVariable @splatRemoveVariable
+
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+                $SqlCredential.UserName -eq 'sa'
+            }
+        }
     }
 
     Context 'ByObject' {
@@ -75,6 +93,15 @@ Describe 'Remove-SsisEnvironmentVariable' {
 
             $variable | Remove-SsisEnvironmentVariable -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
             $err | Should -Not -BeNullOrEmpty
+            Should -Invoke -CommandName Remove-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        }
+
+        It 'Supports -WhatIf on a piped variable and does not remove' {
+            $variable = [PSCustomObject]@{ Name = 'Port'; Parent = [PSCustomObject]@{ Name = 'Prod' } }
+            $variable.PSObject.TypeNames.Insert(0, 'Ssis.EnvironmentVariable')
+
+            $variable | Remove-SsisEnvironmentVariable -WhatIf
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Remove-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
         }
     }

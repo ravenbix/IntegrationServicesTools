@@ -74,5 +74,18 @@ Describe 'Get-SsisEnvironmentVariable' {
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Get-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Environment.Name -eq 'Prod' }
         }
+
+        It 'Returns a single named variable from a piped environment without connecting' {
+            $environment = [PSCustomObject]@{ Name = 'Prod' }
+            $environment.PSObject.TypeNames.Insert(0, 'Ssis.Environment')
+
+            $result = $environment | Get-SsisEnvironmentVariable -Name 'ConnString'
+            $result.Name | Should -Be 'ConnString'
+            $result.PSObject.TypeNames | Should -Contain 'Ssis.EnvironmentVariable'
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-SsisEnvironmentVariableObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+                $Environment.Name -eq 'Prod' -and $Name -eq 'ConnString'
+            }
+        }
     }
 }
