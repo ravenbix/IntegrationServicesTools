@@ -20,6 +20,9 @@ function ConvertTo-SsisTypeCode
 
             Returns [System.TypeCode]::Int32, forced by the explicit data type name.
 
+        .OUTPUTS
+            System.TypeCode
+
         .PARAMETER Value
             The value whose .NET type is used to infer the type code when -DataType is not supplied.
             A null value infers String. Ignored when -DataType is given.
