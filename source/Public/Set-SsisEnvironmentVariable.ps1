@@ -50,7 +50,9 @@ function Set-SsisEnvironmentVariable
 
         .PARAMETER DataType
             An explicit SSIS data type name (Boolean, Byte, Int16, Int32, Int64, Single, Double, Decimal,
-            DateTime, String) that overrides the type inferred from -Value.
+            DateTime, String) that overrides the type inferred from -Value. Applies only when the variable
+            is being created; the data type of an existing variable cannot be changed and -DataType is
+            ignored on update.
 
         .PARAMETER Sensitive
             Stores the variable value encrypted (sensitive) on the server. Sensitive values are returned
