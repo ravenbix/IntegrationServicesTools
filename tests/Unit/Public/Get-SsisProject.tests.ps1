@@ -45,6 +45,13 @@ Describe 'Get-SsisProject' {
             $result = Get-SsisProject -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
             $result | Should -BeNullOrEmpty
         }
+
+        It 'Warns when a named project is not found' {
+            Mock -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -MockWith { $null }
+            $result = Get-SsisProject -SqlInstance 'TestInstance' -Name 'Missing' -WarningVariable warnings -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            $warnings | Should -Not -BeNullOrEmpty
+        }
     }
 
     Context 'ByObject' {

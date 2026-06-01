@@ -78,6 +78,7 @@ function Get-SsisPackage
     process
     {
         $packageParameters = @{}
+        $found = $false
 
         if ($PSBoundParameters.ContainsKey('Name'))
         {
@@ -92,8 +93,14 @@ function Get-SsisPackage
             {
                 if ($null -ne $package)
                 {
+                    $found = $true
                     $package | Add-SsisTypeName -TypeName 'Ssis.Package'
                 }
+            }
+
+            if ($PSBoundParameters.ContainsKey('Name') -and -not $found)
+            {
+                Write-Warning -Message ('Package ''{0}'' was not found in the SSISDB catalog.' -f $Name)
             }
 
             return
@@ -155,10 +162,16 @@ function Get-SsisPackage
                 {
                     if ($null -ne $package)
                     {
+                        $found = $true
                         $package | Add-SsisTypeName -TypeName 'Ssis.Package'
                     }
                 }
             }
+        }
+
+        if ($PSBoundParameters.ContainsKey('Name') -and -not $found)
+        {
+            Write-Warning -Message ('Package ''{0}'' was not found in the SSISDB catalog.' -f $Name)
         }
     }
 }

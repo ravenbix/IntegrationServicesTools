@@ -38,6 +38,13 @@ Describe 'Get-SsisPackage' {
             $result | Should -BeNullOrEmpty
         }
 
+        It 'Warns when a named package is not found' {
+            Mock -CommandName Get-SsisPackageObject -ModuleName $script:moduleName -MockWith { $null }
+            $result = Get-SsisPackage -SqlInstance 'TestInstance' -Name 'Missing.dtsx' -WarningVariable warnings -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            $warnings | Should -Not -BeNullOrEmpty
+        }
+
         It 'Enumerates packages across all folders and projects when scopes are omitted' {
             Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith {
                 @([PSCustomObject]@{ Name = 'F1' }, [PSCustomObject]@{ Name = 'F2' })

@@ -72,6 +72,7 @@ function Get-SsisProject
     process
     {
         $projectParameters = @{}
+        $found = $false
 
         if ($PSBoundParameters.ContainsKey('Name'))
         {
@@ -86,8 +87,14 @@ function Get-SsisProject
             {
                 if ($null -ne $project)
                 {
+                    $found = $true
                     $project | Add-SsisTypeName -TypeName 'Ssis.Project'
                 }
+            }
+
+            if ($PSBoundParameters.ContainsKey('Name') -and -not $found)
+            {
+                Write-Warning -Message ('Project ''{0}'' was not found in the SSISDB catalog.' -f $Name)
             }
 
             return
@@ -133,9 +140,15 @@ function Get-SsisProject
             {
                 if ($null -ne $project)
                 {
+                    $found = $true
                     $project | Add-SsisTypeName -TypeName 'Ssis.Project'
                 }
             }
+        }
+
+        if ($PSBoundParameters.ContainsKey('Name') -and -not $found)
+        {
+            Write-Warning -Message ('Project ''{0}'' was not found in the SSISDB catalog.' -f $Name)
         }
     }
 }
