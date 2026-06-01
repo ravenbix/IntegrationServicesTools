@@ -8,7 +8,8 @@ function Get-SsisReadmeNounGroup
             Returns the noun portion (the text after the 'Ssis' prefix) of a
             <Verb>-Ssis<Noun> command name. Any noun beginning with 'Environment'
             (Environment, EnvironmentVariable, EnvironmentReference) collapses to the
-            single group 'Environment'.
+            single group 'Environment'. Throws if the supplied name does not contain
+            the '-Ssis' segment (i.e. is not a <Verb>-Ssis<Noun> command).
 
         .PARAMETER CommandName
             The full command name, for example 'Get-SsisEnvironmentVariable'.
@@ -33,6 +34,11 @@ function Get-SsisReadmeNounGroup
     process
     {
         $noun = ($CommandName -split '-Ssis', 2)[1]
+
+        if ([string]::IsNullOrEmpty($noun))
+        {
+            throw "Command name '$CommandName' is not a <Verb>-Ssis<Noun> command."
+        }
 
         if ($noun -like 'Environment*')
         {

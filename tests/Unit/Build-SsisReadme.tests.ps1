@@ -15,9 +15,13 @@ Describe 'Get-SsisReadmeNounGroup' {
     It 'collapses EnvironmentReference under Environment' {
         Get-SsisReadmeNounGroup -CommandName 'New-SsisEnvironmentReference' | Should -BeExactly 'Environment'
     }
+
+    It 'keeps a plain Environment noun as Environment' {
+        Get-SsisReadmeNounGroup -CommandName 'Get-SsisEnvironment' | Should -BeExactly 'Environment'
+    }
 }
 
-Describe 'Get-SsisReadmeGroupRank / Get-SsisReadmeVerbRank' {
+Describe 'Get-SsisReadmeGroupRank' {
     It 'orders known groups in workflow precedence' {
         (Get-SsisReadmeGroupRank -Group 'Catalog') |
             Should -BeLessThan (Get-SsisReadmeGroupRank -Group 'Project')
@@ -28,8 +32,18 @@ Describe 'Get-SsisReadmeGroupRank / Get-SsisReadmeVerbRank' {
             Should -BeLessThan (Get-SsisReadmeGroupRank -Group 'Zebra')
     }
 
+    It 'ranks Catalog first (0)' {
+        Get-SsisReadmeGroupRank -Group 'Catalog' | Should -Be 0
+    }
+}
+
+Describe 'Get-SsisReadmeVerbRank' {
     It 'orders Get before Remove' {
         (Get-SsisReadmeVerbRank -Verb 'Get') |
             Should -BeLessThan (Get-SsisReadmeVerbRank -Verb 'Remove')
+    }
+
+    It 'ranks Get first (0)' {
+        Get-SsisReadmeVerbRank -Verb 'Get' | Should -Be 0
     }
 }
