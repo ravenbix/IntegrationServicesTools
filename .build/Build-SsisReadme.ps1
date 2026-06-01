@@ -292,3 +292,65 @@ function ConvertTo-SsisReadme
         return $template.Replace($token, $block)
     }
 }
+
+function Update-SsisReadme
+{
+    <#
+        .SYNOPSIS
+            Generates and writes README.md from the template and public command set.
+
+        .DESCRIPTION
+            Calls ConvertTo-SsisReadme and writes the result to the output path as
+            UTF-8 without a byte-order mark (matching the repository encoding). This
+            is the only side-effecting function in the README generator.
+
+        .PARAMETER TemplatePath
+            Path to README.template.md.
+
+        .PARAMETER SourcePath
+            Path to the folder of public command *.ps1 files (source/Public).
+
+        .PARAMETER OutputPath
+            Path to write the generated README.md.
+
+        .EXAMPLE
+            Update-SsisReadme -TemplatePath './README.template.md' -SourcePath './source/Public' -OutputPath './README.md'
+
+            Regenerates README.md in place.
+
+        .OUTPUTS
+            None.
+    #>
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    [OutputType([void])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $TemplatePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $SourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $OutputPath
+    )
+
+    process
+    {
+        $splatReadme = @{
+            TemplatePath = $TemplatePath
+            SourcePath   = $SourcePath
+        }
+
+        $content = ConvertTo-SsisReadme @splatReadme
+
+        if ($PSCmdlet.ShouldProcess($OutputPath, 'Write generated README'))
+        {
+            $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+            [System.IO.File]::WriteAllText($OutputPath, $content, $utf8NoBom)
+        }
+    }
+}

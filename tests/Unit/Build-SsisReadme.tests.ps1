@@ -142,3 +142,39 @@ MIT
         $result | Should -Match 'exposes 0 commands'
     }
 }
+
+Describe 'Update-SsisReadme' {
+    BeforeAll {
+        $script:srcDir = Join-Path -Path $TestDrive -ChildPath 'PublicW'
+        New-Item -Path $script:srcDir -ItemType Directory -Force | Out-Null
+        Set-Content -Path (Join-Path $script:srcDir 'Get-SsisCatalog.ps1') -Encoding UTF8 -Value @'
+function Get-SsisCatalog
+{
+    <#
+        .SYNOPSIS
+            Gets the catalog.
+    #>
+    [CmdletBinding()]
+    param ()
+}
+'@
+        $script:tpl = Join-Path -Path $TestDrive -ChildPath 'README.template.md'
+        Set-Content -Path $script:tpl -Encoding UTF8 -Value @'
+# Title
+<!-- SSIS:COMMANDS -->
+'@
+        $script:outFile = Join-Path -Path $TestDrive -ChildPath 'README.md'
+    }
+
+    It 'writes the generated README to the output path' {
+        Update-SsisReadme -TemplatePath $script:tpl -SourcePath $script:srcDir -OutputPath $script:outFile
+        Test-Path -Path $script:outFile | Should -BeTrue
+        Get-Content -Raw -Path $script:outFile | Should -Match 'Get-SsisCatalog'
+    }
+
+    It 'writes UTF-8 without a BOM' {
+        Update-SsisReadme -TemplatePath $script:tpl -SourcePath $script:srcDir -OutputPath $script:outFile
+        $bytes = [System.IO.File]::ReadAllBytes($script:outFile)
+        ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) | Should -BeFalse
+    }
+}
