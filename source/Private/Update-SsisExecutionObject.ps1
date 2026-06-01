@@ -20,6 +20,7 @@ function Update-SsisExecutionObject
         .OUTPUTS
             Microsoft.SqlServer.Management.IntegrationServices.ExecutionOperation
     #>
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Thin interop wrapper; ShouldProcess is implemented by the public command (Wait-SsisExecution) that calls this seam.')]
     [CmdletBinding()]
     [OutputType('Microsoft.SqlServer.Management.IntegrationServices.ExecutionOperation')]
     param

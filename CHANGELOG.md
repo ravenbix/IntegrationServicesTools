@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Wait-SsisExecution command.
+- Stop-SsisExecution command.
+- Start-SsisExecution command.
+- Get-SsisExecution command.
 - Continuously generated README: a professional README.template.md plus a Generate_Readme
   build task and QA drift test (with an Assert_Readme_Clean build gate) that regenerate and
   verify the command reference from source/Public.
