@@ -14,7 +14,7 @@
 
 ## Read before starting (carried over from Phase 0/1)
 
-1. **Two real parameter sets this phase.** Unlike Phase 1 (which overloaded `-SqlInstance [object]`), Phase 2 commands declare `DefaultParameterSetName = 'ByInstance'` plus a `ByObject` set whose `-InputObject` binds a piped `Ssis.*` MOM object (`ValueFromPipeline`). `-SqlInstance` uses `ValueFromPipelineByPropertyName` only (not by value), so a piped object always routes to `ByObject`.
+1. **Two real parameter sets this phase.** Unlike Phase 1 (which overloaded `-SqlInstance [object]`), Phase 2 commands declare `DefaultParameterSetName = 'ByInstance'` plus a `ByObject` set whose `-InputObject` binds a piped `Ssis.*` MOM object (`ValueFromPipeline`). `-SqlInstance` is positional/mandatory in `ByInstance` and carries **no** pipeline-binding attribute — VERIFIED in Task 4 that adding `ValueFromPipelineByPropertyName` to `-SqlInstance` breaks routing of a piped object to `ByObject`. Keep `-SqlInstance` free of any `ValueFrom*` attribute; `-InputObject` (ValueFromPipeline) is the only pipeline-bound parameter, so piped objects route to `ByObject` cleanly.
 2. **Sampler QA gates *private* functions too.** Every new private wrapper needs its own `tests/Unit/Private/<Name>.tests.ps1`, must pass PSScriptAnalyzer, and must have full comment-based help (`.SYNOPSIS`, `.DESCRIPTION` > 40 chars, an `.EXAMPLE` whose text contains the function name, and a > 25-char description for **every** parameter).
 3. **State-changing private wrappers** trip `PSUseShouldProcessForStateChangingFunctions` only for verbs New/Set/Remove/Start/Stop/Restart/Reset/Update. Of the new wrappers, **only `Remove-SsisProjectObject`** needs the `[SuppressMessageAttribute(...)]` (verb `Remove`); `Publish-`/`Export-`/`Get-` wrappers do not trigger the rule.
 4. **File I/O uses mockable cmdlets, not static methods.** The spec describes reading/writing `.ispac` bytes; implement with `Get-Content -Encoding Byte -Raw` and `Set-Content -Encoding Byte` (PS 5.1) — Pester 5 **cannot** mock `[System.IO.File]` static methods, but it can mock these cmdlets. File I/O still lives in the public layer (not the MOM seam), as the spec requires.
@@ -785,7 +785,7 @@ function Get-SsisProject
     [OutputType('Ssis.Project')]
     param
     (
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance')]
         [Alias('ServerInstance')]
         [object]
         $SqlInstance,
@@ -1015,7 +1015,7 @@ function Get-SsisPackage
     [OutputType('Ssis.Package')]
     param
     (
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance')]
         [Alias('ServerInstance')]
         [object]
         $SqlInstance,
@@ -1262,7 +1262,7 @@ function Publish-SsisProject
     [OutputType('Ssis.Project')]
     param
     (
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance')]
         [Alias('ServerInstance')]
         [object]
         $SqlInstance,
@@ -1487,7 +1487,7 @@ function Export-SsisProject
     [OutputType([System.IO.FileInfo])]
     param
     (
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance')]
         [Alias('ServerInstance')]
         [object]
         $SqlInstance,
@@ -1703,7 +1703,7 @@ function Remove-SsisProject
     [OutputType([void])]
     param
     (
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance', ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'ByInstance')]
         [Alias('ServerInstance')]
         [object]
         $SqlInstance,
