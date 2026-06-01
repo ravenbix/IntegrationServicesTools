@@ -47,5 +47,55 @@
         </TableRowEntries>
       </TableControl>
     </View>
+    <View>
+      <Name>Ssis.Project</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.Project</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Folder</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Version</Label></TableColumnHeader>
+          <TableColumnHeader><Label>LastDeployedTime</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Description</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>$_.Parent.Name</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>'{0}.{1}' -f $_.VersionMajor, $_.VersionMinor</ScriptBlock></TableColumnItem>
+              <TableColumnItem><PropertyName>LastDeployedTime</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Description</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Ssis.Package</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.Package</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Project</Label></TableColumnHeader>
+          <TableColumnHeader><Label>EntryPoint</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Description</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>$_.Parent.Name</ScriptBlock></TableColumnItem>
+              <TableColumnItem><PropertyName>EntryPoint</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Description</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
   </ViewDefinitions>
 </Configuration>
