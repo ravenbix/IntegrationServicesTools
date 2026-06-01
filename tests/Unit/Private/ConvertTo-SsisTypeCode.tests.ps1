@@ -10,8 +10,11 @@ AfterAll {
 Describe 'ConvertTo-SsisTypeCode' {
     Context 'Inference from the value .NET type' {
         It 'Maps <Label> to <Expected>' -ForEach @(
+            @{ Label = 'Byte';     Value = [byte]1;             Expected = 'Byte' }
+            @{ Label = 'Int16';    Value = [int16]1;           Expected = 'Int16' }
             @{ Label = 'Int32';    Value = [int]42;            Expected = 'Int32' }
             @{ Label = 'Int64';    Value = [long]42;           Expected = 'Int64' }
+            @{ Label = 'Single';   Value = [float]1.0;         Expected = 'Single' }
             @{ Label = 'String';   Value = 'hello';            Expected = 'String' }
             @{ Label = 'Boolean';  Value = $true;              Expected = 'Boolean' }
             @{ Label = 'Decimal';  Value = [decimal]1.5;       Expected = 'Decimal' }
