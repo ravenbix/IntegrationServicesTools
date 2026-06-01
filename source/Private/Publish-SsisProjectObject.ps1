@@ -45,6 +45,8 @@ function Publish-SsisProjectObject
 
     process
     {
-        $Folder.DeployProject($Name, $ProjectBytes)
+        # DeployProject returns an Operation; discard it so this void wrapper does not leak it into
+        # the caller's pipeline (the public Publish-SsisProject re-reads and returns the project).
+        $null = $Folder.DeployProject($Name, $ProjectBytes)
     }
 }

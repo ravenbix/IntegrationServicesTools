@@ -26,4 +26,21 @@ Describe 'Publish-SsisProjectObject' {
             $folder.DeployedBytes | Should -Be $bytes
         }
     }
+
+    It 'Does not emit the value returned by DeployProject' {
+        InModuleScope $script:moduleName {
+            # The real CatalogFolder.DeployProject returns an Operation object; the wrapper declares
+            # [OutputType([void])] and must not leak that return value into the pipeline (otherwise the
+            # public Publish-SsisProject emits both the Operation and the project as an array).
+            $folder = [PSCustomObject]@{}
+            $folder | Add-Member -MemberType 'ScriptMethod' -Name 'DeployProject' -Value {
+                param ($projectName, $projectStream)
+                return 'fake-operation'
+            }
+
+            $result = Publish-SsisProjectObject -Folder $folder -Name 'Sales' -ProjectBytes ([byte[]](1, 2, 3))
+
+            $result | Should -BeNullOrEmpty
+        }
+    }
 }

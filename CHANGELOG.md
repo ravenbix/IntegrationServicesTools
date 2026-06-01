@@ -35,6 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Publish-SsisProject no longer leaks the deploy Operation into its output; the interop wrapper
+  discards the value returned by CatalogFolder.DeployProject so the command emits only the
+  Ssis.Project. Caught by the project integration lifecycle test against a real SSISDB.
 - Declare `Configuration` and `Metadata` required modules so the build bootstrap installs
   ModuleBuilder's dependencies (the build previously failed resolving them).
 - Load the SSIS assemblies through a compiled assembly resolver instead of a PowerShell
