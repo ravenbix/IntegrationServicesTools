@@ -16,7 +16,7 @@ task Generate_Readme {
         OutputPath   = Join-Path -Path $BuildRoot -ChildPath 'README.md'
     }
 
-    Write-Build -Color 'Green' -Text 'Regenerating README.md from template'
+    Write-Build Green 'Regenerating README.md from template'
 
     Update-SsisReadme @splatReadme -Confirm:$false
 }
