@@ -64,6 +64,7 @@ Describe 'Validation (integration)' -Tag 'Integration' -Skip:$script:skipIntegra
             Confirm     = $false
         }
         $operation = Start-SsisValidation @splatValidate
+        $operation.PSObject.TypeNames | Should -Contain 'Ssis.Operation'
         $operation.Status.ToString() | Should -BeIn @('Success', 'Failed', 'Canceled', 'UnexpectTerminated', 'Completion')
     }
 
