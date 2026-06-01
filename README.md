@@ -114,82 +114,82 @@ IntegrationServicesTools exposes 31 commands.
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisCatalog** | Gets the SSISDB catalog from a SQL Server instance. |
-| **New-SsisCatalog** | Creates the SSISDB catalog on a SQL Server instance. |
-| **Set-SsisCatalog** | Configures properties of the SSISDB catalog on a SQL Server instance. |
+| **[Get-SsisCatalog](source/Public/Get-SsisCatalog.ps1)** | Gets the SSISDB catalog from a SQL Server instance. |
+| **[New-SsisCatalog](source/Public/New-SsisCatalog.ps1)** | Creates the SSISDB catalog on a SQL Server instance. |
+| **[Set-SsisCatalog](source/Public/Set-SsisCatalog.ps1)** | Configures properties of the SSISDB catalog on a SQL Server instance. |
 
 ### Folder
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisFolder** | Gets folders from the SSISDB catalog on a SQL Server instance. |
-| **New-SsisFolder** | Creates a folder in the SSISDB catalog on a SQL Server instance. |
-| **Set-SsisFolder** | Updates the description of a folder in the SSISDB catalog. |
-| **Remove-SsisFolder** | Removes a folder from the SSISDB catalog on a SQL Server instance. |
+| **[Get-SsisFolder](source/Public/Get-SsisFolder.ps1)** | Gets folders from the SSISDB catalog on a SQL Server instance. |
+| **[New-SsisFolder](source/Public/New-SsisFolder.ps1)** | Creates a folder in the SSISDB catalog on a SQL Server instance. |
+| **[Set-SsisFolder](source/Public/Set-SsisFolder.ps1)** | Updates the description of a folder in the SSISDB catalog. |
+| **[Remove-SsisFolder](source/Public/Remove-SsisFolder.ps1)** | Removes a folder from the SSISDB catalog on a SQL Server instance. |
 
 ### Project
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisProject** | Gets projects from the SSISDB catalog on a SQL Server instance. |
-| **Publish-SsisProject** | Deploys an .ispac project into a folder of the SSISDB catalog. |
-| **Export-SsisProject** | Exports an SSISDB project to an .ispac file on disk. |
-| **Remove-SsisProject** | Removes a project from a folder in the SSISDB catalog. |
+| **[Get-SsisProject](source/Public/Get-SsisProject.ps1)** | Gets projects from the SSISDB catalog on a SQL Server instance. |
+| **[Publish-SsisProject](source/Public/Publish-SsisProject.ps1)** | Deploys an .ispac project into a folder of the SSISDB catalog. |
+| **[Export-SsisProject](source/Public/Export-SsisProject.ps1)** | Exports an SSISDB project to an .ispac file on disk. |
+| **[Remove-SsisProject](source/Public/Remove-SsisProject.ps1)** | Removes a project from a folder in the SSISDB catalog. |
 
 ### Package
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisPackage** | Gets packages from projects in the SSISDB catalog on a SQL Server instance. |
+| **[Get-SsisPackage](source/Public/Get-SsisPackage.ps1)** | Gets packages from projects in the SSISDB catalog on a SQL Server instance. |
 
 ### Environment
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisEnvironment** | Gets environments from the SSISDB catalog on a SQL Server instance. |
-| **Get-SsisEnvironmentReference** | Gets the environment references defined on an SSISDB project. |
-| **Get-SsisEnvironmentVariable** | Gets variables from an environment in the SSISDB catalog on a SQL Server instance. |
-| **New-SsisEnvironment** | Creates an environment in a folder of the SSISDB catalog. |
-| **New-SsisEnvironmentReference** | Creates an environment reference from an SSISDB project to an environment. |
-| **Set-SsisEnvironmentVariable** | Adds or updates a variable on an SSISDB environment. |
-| **Remove-SsisEnvironment** | Removes an environment from the SSISDB catalog on a SQL Server instance. |
-| **Remove-SsisEnvironmentReference** | Removes an environment reference from an SSISDB project. |
-| **Remove-SsisEnvironmentVariable** | Removes a variable from an SSISDB environment on a SQL Server instance. |
+| **[Get-SsisEnvironment](source/Public/Get-SsisEnvironment.ps1)** | Gets environments from the SSISDB catalog on a SQL Server instance. |
+| **[Get-SsisEnvironmentReference](source/Public/Get-SsisEnvironmentReference.ps1)** | Gets the environment references defined on an SSISDB project. |
+| **[Get-SsisEnvironmentVariable](source/Public/Get-SsisEnvironmentVariable.ps1)** | Gets variables from an environment in the SSISDB catalog on a SQL Server instance. |
+| **[New-SsisEnvironment](source/Public/New-SsisEnvironment.ps1)** | Creates an environment in a folder of the SSISDB catalog. |
+| **[New-SsisEnvironmentReference](source/Public/New-SsisEnvironmentReference.ps1)** | Creates an environment reference from an SSISDB project to an environment. |
+| **[Set-SsisEnvironmentVariable](source/Public/Set-SsisEnvironmentVariable.ps1)** | Adds or updates a variable on an SSISDB environment. |
+| **[Remove-SsisEnvironment](source/Public/Remove-SsisEnvironment.ps1)** | Removes an environment from the SSISDB catalog on a SQL Server instance. |
+| **[Remove-SsisEnvironmentReference](source/Public/Remove-SsisEnvironmentReference.ps1)** | Removes an environment reference from an SSISDB project. |
+| **[Remove-SsisEnvironmentVariable](source/Public/Remove-SsisEnvironmentVariable.ps1)** | Removes a variable from an SSISDB environment on a SQL Server instance. |
 
 ### Parameter
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisParameter** | Gets parameters from a project or package in the SSISDB catalog. |
-| **Set-SsisParameter** | Sets the value of a project or package parameter in the SSISDB catalog. |
+| **[Get-SsisParameter](source/Public/Get-SsisParameter.ps1)** | Gets parameters from a project or package in the SSISDB catalog. |
+| **[Set-SsisParameter](source/Public/Set-SsisParameter.ps1)** | Sets the value of a project or package parameter in the SSISDB catalog. |
 
 ### Execution
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisExecution** | Gets package executions from the SSISDB catalog on a SQL Server instance. |
-| **Start-SsisExecution** | Starts an SSISDB package execution. |
-| **Stop-SsisExecution** | Stops a running SSISDB execution. |
-| **Wait-SsisExecution** | Waits for an SSISDB execution to reach a terminal state. |
+| **[Get-SsisExecution](source/Public/Get-SsisExecution.ps1)** | Gets package executions from the SSISDB catalog on a SQL Server instance. |
+| **[Start-SsisExecution](source/Public/Start-SsisExecution.ps1)** | Starts an SSISDB package execution. |
+| **[Stop-SsisExecution](source/Public/Stop-SsisExecution.ps1)** | Stops a running SSISDB execution. |
+| **[Wait-SsisExecution](source/Public/Wait-SsisExecution.ps1)** | Waits for an SSISDB execution to reach a terminal state. |
 
 ### ExecutionMessage
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisExecutionMessage** | Gets the message log of an SSISDB execution. |
+| **[Get-SsisExecutionMessage](source/Public/Get-SsisExecutionMessage.ps1)** | Gets the message log of an SSISDB execution. |
 
 ### Operation
 
 | Command | Synopsis |
 | --- | --- |
-| **Get-SsisOperation** | Gets operations (executions, deployments, validations) from the SSISDB catalog. |
-| **Wait-SsisOperation** | Waits for an SSISDB operation to reach a terminal state. |
+| **[Get-SsisOperation](source/Public/Get-SsisOperation.ps1)** | Gets operations (executions, deployments, validations) from the SSISDB catalog. |
+| **[Wait-SsisOperation](source/Public/Wait-SsisOperation.ps1)** | Waits for an SSISDB operation to reach a terminal state. |
 
 ### Validation
 
 | Command | Synopsis |
 | --- | --- |
-| **Start-SsisValidation** | Validates an SSISDB project or package. |
+| **[Start-SsisValidation](source/Public/Start-SsisValidation.ps1)** | Validates an SSISDB project or package. |
 
 ## Usage examples
 

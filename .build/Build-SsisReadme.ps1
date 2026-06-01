@@ -148,8 +148,9 @@ function Get-SsisReadmeCommandInfo
         .DESCRIPTION
             Parses a PowerShell source file with the language AST and reads the
             function's comment-based help synopsis. Returns a single object carrying
-            the data the README index needs. Files that contain no function definition
-            are ignored (no output).
+            the data the README index needs, including the source file Path so the
+            index can link each command to its definition. Files that contain no
+            function definition are ignored (no output).
 
         .PARAMETER Path
             Full path to a *.ps1 file under source/Public.
@@ -157,7 +158,7 @@ function Get-SsisReadmeCommandInfo
         .EXAMPLE
             Get-SsisReadmeCommandInfo -Path 'source/Public/Get-SsisFolder.ps1'
 
-            Returns an object with Name, Verb, Group, and Synopsis.
+            Returns an object with Name, Verb, Group, Synopsis, and Path.
 
         .OUTPUTS
             PSCustomObject
@@ -193,6 +194,7 @@ function Get-SsisReadmeCommandInfo
             Verb     = $verb
             Group    = Get-SsisReadmeNounGroup -CommandName $name
             Synopsis = $synopsis
+            Path     = $Path
         }
     }
 }
@@ -206,9 +208,11 @@ function ConvertTo-SsisReadme
         .DESCRIPTION
             Reads the README template, enumerates the public command source files,
             assembles a command-reference index grouped by SSIS noun (Environment
-            variants collapsed) with a total count, and substitutes the index for the
-            <!-- SSIS:COMMANDS --> token. Returns the complete README text. Pure: it
-            performs no writes. Throws if the template lacks the token.
+            variants collapsed) with a total count, links each command name to its
+            public source file (relative to the template/README directory), and
+            substitutes the index for the <!-- SSIS:COMMANDS --> token. Returns the
+            complete README text. Pure: it performs no writes. Throws if the template
+            lacks the token.
 
         .PARAMETER TemplatePath
             Path to README.template.md.
@@ -241,6 +245,9 @@ function ConvertTo-SsisReadme
     {
         $token = '<!-- SSIS:COMMANDS -->'
         $template = Get-Content -Raw -Encoding UTF8 -Path $TemplatePath
+
+        # Source-file links are written relative to the README, which sits beside the template.
+        $baseDir = Split-Path -Path $TemplatePath -Parent
 
         if (-not $template.Contains($token))
         {
@@ -286,7 +293,20 @@ function ConvertTo-SsisReadme
             {
                 # Escape any literal pipe in a synopsis so it cannot break the Markdown table cell.
                 $cell = $command.Synopsis -replace '\|', '\|'
-                $lines.Add("| **$($command.Name)** | $cell |")
+
+                # Link the command name to its public source file, relative to the README.
+                if ($command.Path.StartsWith($baseDir, [System.StringComparison]::OrdinalIgnoreCase))
+                {
+                    $relative = $command.Path.Substring($baseDir.Length).TrimStart('\', '/')
+                }
+                else
+                {
+                    $relative = Split-Path -Path $command.Path -Leaf
+                }
+
+                $relative = $relative -replace '\\', '/'
+
+                $lines.Add("| **[$($command.Name)]($relative)** | $cell |")
             }
         }
 

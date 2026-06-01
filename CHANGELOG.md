@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README: a Motivation section, a Supported SQL Server versions table (2012-2025), and
   Code of Conduct and Security links.
 
+### Changed
+
+- README command reference: each public command name in the generated command tables now links to
+  its `source/Public/<Name>.ps1` definition (the README generator emits a Markdown link, relative
+  to the README, with forward-slash paths).
+
 ### Fixed
 
 - Corrected ServerOperationStatus enum member names used by Wait-SsisExecution (terminalStates),
