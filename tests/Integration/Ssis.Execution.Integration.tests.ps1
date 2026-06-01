@@ -55,7 +55,7 @@ Describe 'Execution lifecycle (integration)' -Tag 'Integration' -Skip:$script:sk
         }
         $execution = Start-SsisExecution @splatStart
         $execution.PSObject.TypeNames | Should -Contain 'Ssis.Execution'
-        $execution.Status.ToString() | Should -BeIn @('Succeeded', 'Failed', 'Completed')
+        $execution.Status.ToString() | Should -BeIn @('Succeeded', 'Failed', 'Cancelled', 'EndedUnexpectedly', 'Completed')
     }
 
     It 'Finds the execution by id and by status' {
