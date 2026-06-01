@@ -20,6 +20,15 @@ through SQL Server Management Studio.
 It targets administrators and DevOps engineers who automate SSIS deployments and want
 composable, pipeline-friendly commands that return real objects.
 
+## Motivation
+
+Administering the SSISDB catalog usually means clicking through SQL Server Management
+Studio dialogs or hand-writing calls to the `catalog.*` stored procedures — neither of
+which composes, scripts, or version-controls cleanly. IntegrationServicesTools closes
+that gap: it exposes the Integration Services managed object model as idiomatic,
+pipeline-friendly PowerShell so catalog setup, project deployment, environment wiring,
+and parameter binding become repeatable, reviewable automation instead of manual steps.
+
 ## Features
 
 - **Catalog administration** — create, inspect, and configure the SSISDB catalog.
@@ -38,6 +47,21 @@ composable, pipeline-friendly commands that return real objects.
   SSIS managed object model assemblies this module loads at import. Install with
   `Install-Module dbatools.library`.
 - **Windows integrated authentication** by default; SQL logins are supported via `-SqlCredential`.
+
+### Supported SQL Server versions
+
+The module targets the on-premises database engine and supports every release that ships
+the SSISDB catalog:
+
+| SQL Server release | Database engine version | SSISDB (Project Deployment Model) |
+| --- | --- | --- |
+| 2012 | 11.0 | Yes (SSISDB introduced) |
+| 2014 | 12.0 | Yes |
+| 2016 | 13.0 | Yes |
+| 2017 | 14.0 | Yes |
+| 2019 | 15.0 | Yes |
+| 2022 | 16.0 | Yes |
+| 2025 | 17.0 | Yes |
 
 ## Installation
 
@@ -87,55 +111,85 @@ Get-SsisProject -SqlInstance $instance -Folder 'Finance'
 IntegrationServicesTools exposes 31 commands.
 
 ### Catalog
-- **Get-SsisCatalog** — Gets the SSISDB catalog from a SQL Server instance.
-- **New-SsisCatalog** — Creates the SSISDB catalog on a SQL Server instance.
-- **Set-SsisCatalog** — Configures properties of the SSISDB catalog on a SQL Server instance.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisCatalog** | Gets the SSISDB catalog from a SQL Server instance. |
+| **New-SsisCatalog** | Creates the SSISDB catalog on a SQL Server instance. |
+| **Set-SsisCatalog** | Configures properties of the SSISDB catalog on a SQL Server instance. |
 
 ### Folder
-- **Get-SsisFolder** — Gets folders from the SSISDB catalog on a SQL Server instance.
-- **New-SsisFolder** — Creates a folder in the SSISDB catalog on a SQL Server instance.
-- **Set-SsisFolder** — Updates the description of a folder in the SSISDB catalog.
-- **Remove-SsisFolder** — Removes a folder from the SSISDB catalog on a SQL Server instance.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisFolder** | Gets folders from the SSISDB catalog on a SQL Server instance. |
+| **New-SsisFolder** | Creates a folder in the SSISDB catalog on a SQL Server instance. |
+| **Set-SsisFolder** | Updates the description of a folder in the SSISDB catalog. |
+| **Remove-SsisFolder** | Removes a folder from the SSISDB catalog on a SQL Server instance. |
 
 ### Project
-- **Get-SsisProject** — Gets projects from the SSISDB catalog on a SQL Server instance.
-- **Publish-SsisProject** — Deploys an .ispac project into a folder of the SSISDB catalog.
-- **Export-SsisProject** — Exports an SSISDB project to an .ispac file on disk.
-- **Remove-SsisProject** — Removes a project from a folder in the SSISDB catalog.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisProject** | Gets projects from the SSISDB catalog on a SQL Server instance. |
+| **Publish-SsisProject** | Deploys an .ispac project into a folder of the SSISDB catalog. |
+| **Export-SsisProject** | Exports an SSISDB project to an .ispac file on disk. |
+| **Remove-SsisProject** | Removes a project from a folder in the SSISDB catalog. |
 
 ### Package
-- **Get-SsisPackage** — Gets packages from projects in the SSISDB catalog on a SQL Server instance.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisPackage** | Gets packages from projects in the SSISDB catalog on a SQL Server instance. |
 
 ### Environment
-- **Get-SsisEnvironment** — Gets environments from the SSISDB catalog on a SQL Server instance.
-- **Get-SsisEnvironmentReference** — Gets the environment references defined on an SSISDB project.
-- **Get-SsisEnvironmentVariable** — Gets variables from an environment in the SSISDB catalog on a SQL Server instance.
-- **New-SsisEnvironment** — Creates an environment in a folder of the SSISDB catalog.
-- **New-SsisEnvironmentReference** — Creates an environment reference from an SSISDB project to an environment.
-- **Set-SsisEnvironmentVariable** — Adds or updates a variable on an SSISDB environment.
-- **Remove-SsisEnvironment** — Removes an environment from the SSISDB catalog on a SQL Server instance.
-- **Remove-SsisEnvironmentReference** — Removes an environment reference from an SSISDB project.
-- **Remove-SsisEnvironmentVariable** — Removes a variable from an SSISDB environment on a SQL Server instance.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisEnvironment** | Gets environments from the SSISDB catalog on a SQL Server instance. |
+| **Get-SsisEnvironmentReference** | Gets the environment references defined on an SSISDB project. |
+| **Get-SsisEnvironmentVariable** | Gets variables from an environment in the SSISDB catalog on a SQL Server instance. |
+| **New-SsisEnvironment** | Creates an environment in a folder of the SSISDB catalog. |
+| **New-SsisEnvironmentReference** | Creates an environment reference from an SSISDB project to an environment. |
+| **Set-SsisEnvironmentVariable** | Adds or updates a variable on an SSISDB environment. |
+| **Remove-SsisEnvironment** | Removes an environment from the SSISDB catalog on a SQL Server instance. |
+| **Remove-SsisEnvironmentReference** | Removes an environment reference from an SSISDB project. |
+| **Remove-SsisEnvironmentVariable** | Removes a variable from an SSISDB environment on a SQL Server instance. |
 
 ### Parameter
-- **Get-SsisParameter** — Gets parameters from a project or package in the SSISDB catalog.
-- **Set-SsisParameter** — Sets the value of a project or package parameter in the SSISDB catalog.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisParameter** | Gets parameters from a project or package in the SSISDB catalog. |
+| **Set-SsisParameter** | Sets the value of a project or package parameter in the SSISDB catalog. |
 
 ### Execution
-- **Get-SsisExecution** — Gets package executions from the SSISDB catalog on a SQL Server instance.
-- **Start-SsisExecution** — Starts an SSISDB package execution.
-- **Stop-SsisExecution** — Stops a running SSISDB execution.
-- **Wait-SsisExecution** — Waits for an SSISDB execution to reach a terminal state.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisExecution** | Gets package executions from the SSISDB catalog on a SQL Server instance. |
+| **Start-SsisExecution** | Starts an SSISDB package execution. |
+| **Stop-SsisExecution** | Stops a running SSISDB execution. |
+| **Wait-SsisExecution** | Waits for an SSISDB execution to reach a terminal state. |
 
 ### ExecutionMessage
-- **Get-SsisExecutionMessage** — Gets the message log of an SSISDB execution.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisExecutionMessage** | Gets the message log of an SSISDB execution. |
 
 ### Operation
-- **Get-SsisOperation** — Gets operations (executions, deployments, validations) from the SSISDB catalog.
-- **Wait-SsisOperation** — Waits for an SSISDB operation to reach a terminal state.
+
+| Command | Synopsis |
+| --- | --- |
+| **Get-SsisOperation** | Gets operations (executions, deployments, validations) from the SSISDB catalog. |
+| **Wait-SsisOperation** | Waits for an SSISDB operation to reach a terminal state. |
 
 ### Validation
-- **Start-SsisValidation** — Validates an SSISDB project or package.
+
+| Command | Synopsis |
+| --- | --- |
+| **Start-SsisValidation** | Validates an SSISDB project or package. |
 
 ## Usage examples
 
@@ -257,6 +311,16 @@ the latter is generated.
 ## Status
 
 See [CHANGELOG.md](CHANGELOG.md) for released and unreleased changes.
+
+## Code of Conduct
+
+This project adopts the [Contributor Covenant](CODE_OF_CONDUCT.md) code of conduct. By
+participating, you are expected to uphold it.
+
+## Security
+
+To report a security vulnerability, follow the process in [SECURITY.md](SECURITY.md) —
+please do not open a public issue for security bugs.
 
 ## License & acknowledgements
 
