@@ -25,6 +25,28 @@ Describe 'Get-SsisEnvironmentReference' {
             Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Sales' }
         }
 
+        It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+            $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+            $null = Get-SsisEnvironmentReference -SqlInstance 'TestInstance' -SqlCredential $credential -Folder 'Finance' -Project 'Sales'
+
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+                $SqlCredential.UserName -eq 'sa'
+            }
+        }
+
+        It 'Warns and returns nothing when the catalog does not exist' {
+            Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+            $result = Get-SsisEnvironmentReference -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+        }
+
+        It 'Warns and returns nothing when the folder does not exist' {
+            Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith { $null }
+            $result = Get-SsisEnvironmentReference -SqlInstance 'TestInstance' -Folder 'Nope' -Project 'Sales' -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+        }
+
         It 'Warns and returns nothing when the project does not exist' {
             Mock -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -MockWith { $null }
             $result = Get-SsisEnvironmentReference -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Nope' -WarningAction SilentlyContinue

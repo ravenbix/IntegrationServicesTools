@@ -12,14 +12,45 @@ function Get-SsisProject
             warning and returns nothing when the catalog or named folder does not exist.
 
         .EXAMPLE
+            Get-SsisProject -SqlInstance 'SQL01\PROD'
+
+            Returns every project in every folder of the SSISDB catalog on the named instance, using
+            the current Windows identity (integrated authentication).
+
+        .EXAMPLE
             Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance'
 
             Returns the projects in the Finance folder on the named instance.
 
         .EXAMPLE
+            Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales'
+
+            Returns just the Sales project from the Finance folder. Writes a warning when no project
+            of that name is found in scope.
+
+        .EXAMPLE
+            Get-SsisProject -SqlInstance 'SQL01\PROD' -Name 'Sales'
+
+            Returns the Sales project from whichever folder contains it, searching every folder in
+            the catalog because -Folder was omitted.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisProject -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance'
+
+            Connects with SQL Server authentication using the supplied credential and returns the
+            projects in the Finance folder.
+
+        .EXAMPLE
             Get-SsisFolder -SqlInstance 'SQL01\PROD' | Get-SsisProject
 
-            Returns every project in every folder by piping folder objects in.
+            Returns every project in every folder by piping folder objects in (ByObject), reusing
+            the existing connection.
+
+        .EXAMPLE
+            Get-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' | Get-SsisProject -Name 'Sales'
+
+            Pipes the Finance folder in (ByObject) and returns just its Sales project.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

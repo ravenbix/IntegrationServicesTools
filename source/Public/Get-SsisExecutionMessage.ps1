@@ -17,9 +17,24 @@ function Get-SsisExecutionMessage
             Returns every message logged for execution 42.
 
         .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisExecutionMessage -SqlInstance 'SQL01\PROD' -SqlCredential $cred -ExecutionId 42
+
+            Connects with SQL Server authentication using the supplied credential and returns every
+            message logged for execution 42.
+
+        .EXAMPLE
+            Get-SsisExecutionMessage -SqlInstance 'SQL01\PROD' -ExecutionId 42 |
+                Where-Object -FilterScript { $_.MessageType -eq 120 }
+
+            Returns only the error messages (MessageType 120) of execution 42, narrowing the full log
+            with Where-Object.
+
+        .EXAMPLE
             Get-SsisExecution -SqlInstance 'SQL01\PROD' -Status 'Failed' | Get-SsisExecutionMessage
 
-            Returns the messages of each failed execution.
+            Pipes each failed execution in (the ByObject parameter set) and returns its messages
+            without reconnecting.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

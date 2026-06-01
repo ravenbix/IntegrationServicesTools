@@ -14,6 +14,33 @@ function New-SsisFolder
 
             Creates the Finance folder in the SSISDB catalog on the named instance.
 
+        .EXAMPLE
+            New-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance'
+
+            Creates the Finance folder with an empty description (the -Description default).
+
+        .EXAMPLE
+            $cred = Get-Credential
+            New-SsisFolder -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Name 'Finance'
+
+            Connects with SQL Server authentication using the supplied credential and creates the
+            Finance folder.
+
+        .EXAMPLE
+            New-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' -Confirm:$false
+
+            Creates the Finance folder without prompting for confirmation.
+
+        .EXAMPLE
+            New-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' -WhatIf
+
+            Reports what would happen without creating the folder.
+
+        .EXAMPLE
+            'SQL01\PROD', 'SQL02\PROD' | New-SsisFolder -Name 'Finance'
+
+            Pipes instance names in and creates the Finance folder on each instance's catalog in turn.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

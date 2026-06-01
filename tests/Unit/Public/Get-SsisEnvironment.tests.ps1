@@ -76,5 +76,25 @@ Describe 'Get-SsisEnvironment' {
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Get-SsisEnvironmentObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Folder.Name -eq 'Finance' }
         }
+
+        It 'Returns a single environment when a piped folder and -Name are given' {
+            $folder = [PSCustomObject]@{ Name = 'Finance' }
+            $folder.PSObject.TypeNames.Insert(0, 'Ssis.Folder')
+
+            $result = $folder | Get-SsisEnvironment -Name 'Prod'
+            $result.Name | Should -Be 'Prod'
+            $result.PSObject.TypeNames | Should -Contain 'Ssis.Environment'
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-SsisEnvironmentObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Prod' }
+        }
+
+        It 'Warns when a named environment is not found on a piped folder' {
+            Mock -CommandName Get-SsisEnvironmentObject -ModuleName $script:moduleName -MockWith { $null }
+            $folder = [PSCustomObject]@{ Name = 'Finance' }
+            $folder.PSObject.TypeNames.Insert(0, 'Ssis.Folder')
+
+            $folder | Get-SsisEnvironment -Name 'Missing' -WarningVariable warnings -WarningAction SilentlyContinue | Out-Null
+            $warnings | Should -Not -BeNullOrEmpty
+        }
     }
 }

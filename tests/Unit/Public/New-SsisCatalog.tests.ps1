@@ -36,4 +36,30 @@ Describe 'New-SsisCatalog' {
         $null = New-SsisCatalog -SqlInstance 'TestInstance' -CatalogPassword $cred -WhatIf
         Should -Invoke -CommandName New-SsisCatalogObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
+
+    It 'Forwards -SqlCredential to Connect-SsisCatalog when given' {
+        $sqlCred = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString 'p@ss' -AsPlainText -Force))
+        $splatCatalog = @{
+            SqlInstance     = 'TestInstance'
+            SqlCredential   = $sqlCred
+            CatalogPassword = $cred
+        }
+        $null = New-SsisCatalog @splatCatalog
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Passes the CatalogPassword SecureString to the interop wrapper' {
+        $null = New-SsisCatalog -SqlInstance 'TestInstance' -CatalogPassword $cred
+        Should -Invoke -CommandName New-SsisCatalogObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $Password -is [System.Security.SecureString]
+        }
+    }
+
+    It 'Accepts the instance from the pipeline' {
+        $result = 'TestInstance' | New-SsisCatalog -CatalogPassword $cred
+        $result.PSObject.TypeNames | Should -Contain 'Ssis.Catalog'
+        Should -Invoke -CommandName New-SsisCatalogObject -ModuleName $script:moduleName -Exactly -Times 1 -Scope It
+    }
 }

@@ -73,6 +73,65 @@ Describe 'Start-SsisExecution' {
         Should -Invoke -CommandName Start-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = Start-SsisExecution -SqlInstance 'TestInstance' -SqlCredential $credential -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -Confirm:$false
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Disambiguates the environment reference by -EnvironmentFolder' {
+        Mock -CommandName Get-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -MockWith {
+            @(
+                [PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = 'Finance' }
+                [PSCustomObject]@{ Name = 'Prod'; EnvironmentFolderName = 'Shared' }
+            )
+        }
+
+        $splatStart = @{
+            SqlInstance       = 'TestInstance'
+            Folder            = 'Finance'
+            Project           = 'Sales'
+            Package           = 'Load.dtsx'
+            EnvironmentName   = 'Prod'
+            EnvironmentFolder = 'Shared'
+            Confirm           = $false
+        }
+        $null = Start-SsisExecution @splatStart
+
+        Should -Invoke -CommandName Start-SsisExecutionObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $Reference.Name -eq 'Prod' -and $Reference.EnvironmentFolderName -eq 'Shared'
+        }
+    }
+
+    It 'With -Use32BitRuntime alone, passes the flag and no parameter or logging set' {
+        $null = Start-SsisExecution -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -Use32BitRuntime -Confirm:$false
+        Should -Invoke -CommandName Start-SsisExecutionObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $Use32BitRuntime.IsPresent -and $null -eq $Parameter -and [string]::IsNullOrEmpty($LoggingLevel)
+        }
+    }
+
+    It 'Warns and does not start when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = Start-SsisExecution -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -Package 'Load.dtsx' -Confirm:$false -WarningAction SilentlyContinue
+        Should -Invoke -CommandName Start-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Warns and does not start when the folder does not exist' {
+        Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = Start-SsisExecution -SqlInstance 'TestInstance' -Folder 'Missing' -Project 'Sales' -Package 'Load.dtsx' -Confirm:$false -WarningAction SilentlyContinue
+        Should -Invoke -CommandName Start-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Warns and does not start when the project does not exist' {
+        Mock -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = Start-SsisExecution -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Missing' -Package 'Load.dtsx' -Confirm:$false -WarningAction SilentlyContinue
+        Should -Invoke -CommandName Start-SsisExecutionObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
     Context 'ByObject' {
         It 'Starts a piped package without reconnecting' {
             $package = [PSCustomObject]@{

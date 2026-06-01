@@ -15,6 +15,30 @@ function New-SsisCatalog
             Creates SSISDB on the instance, prompting for the encryption password (only the password
             field is used).
 
+        .EXAMPLE
+            $password = Get-Credential -UserName 'ignored' -Message 'SSISDB encryption password'
+            New-SsisCatalog -SqlInstance 'SQL01\PROD' -CatalogPassword $password
+
+            Reuses a pre-collected PSCredential as the encryption password rather than prompting
+            inline. The user name is ignored; only the password protects the catalog.
+
+        .EXAMPLE
+            $splatCatalog = @{
+                SqlInstance     = 'SQL01\PROD'
+                SqlCredential   = $sqlCred
+                CatalogPassword = $password
+            }
+            New-SsisCatalog @splatCatalog
+
+            Connects with SQL Server authentication using -SqlCredential and creates SSISDB,
+            protecting it with the -CatalogPassword.
+
+        .EXAMPLE
+            New-SsisCatalog -SqlInstance 'SQL01\PROD' -CatalogPassword $password -WhatIf
+
+            Reports what would happen without creating the catalog. -Confirm prompts before the
+            create instead.
+
         .PARAMETER SqlInstance
             The SQL Server instance on which to create SSISDB (for example 'SQL01\PROD'), or an SMO
             Server or IntegrationServices object to reuse an existing connection.

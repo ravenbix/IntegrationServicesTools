@@ -52,6 +52,31 @@ Describe 'New-SsisEnvironmentReference' {
         Should -Invoke -CommandName New-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
+    It 'Errors and does not create when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = New-SsisEnvironmentReference -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName New-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Errors and does not create when the folder does not exist' {
+        Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith { $null }
+        $null = New-SsisEnvironmentReference -SqlInstance 'TestInstance' -Folder 'Nope' -Project 'Sales' -Environment 'Prod' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName New-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        $script:refCalls = 0
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = New-SsisEnvironmentReference -SqlInstance 'TestInstance' -SqlCredential $credential -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -Confirm:$false
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
     It 'Supports -WhatIf and does not create' {
         $script:refCalls = 0
         $null = New-SsisEnvironmentReference -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -WhatIf
@@ -67,6 +92,18 @@ Describe 'New-SsisEnvironmentReference' {
             $null = $project | New-SsisEnvironmentReference -Environment 'Prod' -Confirm:$false
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName New-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Project.Name -eq 'Sales' }
+        }
+
+        It 'Creates an absolute reference on a piped project when -EnvironmentFolder is given' {
+            $script:refCalls = 0
+            $project = [PSCustomObject]@{ Name = 'Sales' }
+            $project.PSObject.TypeNames.Insert(0, 'Ssis.Project')
+
+            $null = $project | New-SsisEnvironmentReference -Environment 'Prod' -EnvironmentFolder 'Shared' -Confirm:$false
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName New-SsisEnvironmentReferenceObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+                $Project.Name -eq 'Sales' -and $EnvironmentFolder -eq 'Shared'
+            }
         }
     }
 }

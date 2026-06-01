@@ -14,6 +14,18 @@ function Get-SsisCatalog
 
             Returns the SSISDB catalog on the named instance using Windows authentication.
 
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisCatalog -SqlInstance 'SQL01\PROD' -SqlCredential $cred
+
+            Connects with SQL Server authentication using the supplied credential and returns the
+            SSISDB catalog.
+
+        .EXAMPLE
+            'SQL01\PROD', 'SQL02\PROD' | Get-SsisCatalog
+
+            Pipes instance names in and returns each instance's SSISDB catalog in turn.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

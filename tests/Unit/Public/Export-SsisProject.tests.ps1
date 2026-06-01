@@ -53,6 +53,36 @@ Describe 'Export-SsisProject' {
         Should -Invoke -CommandName Export-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Project.Name -eq 'Sales' }
     }
 
+    It 'Errors and does not write a piped project when the file exists without -Force (ByObject)' {
+        Mock -CommandName Test-Path -ModuleName $script:moduleName -MockWith { $true } -ParameterFilter { $PathType -eq 'Leaf' }
+        $project = [PSCustomObject]@{ Name = 'Sales' }
+        $project.PSObject.TypeNames.Insert(0, 'Ssis.Project')
+
+        $null = $project | Export-SsisProject -Path 'C:\out' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName Set-Content -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
+    It 'Overwrites an existing file for a piped project when -Force is given (ByObject + Force)' {
+        Mock -CommandName Test-Path -ModuleName $script:moduleName -MockWith { $true } -ParameterFilter { $PathType -eq 'Leaf' }
+        $project = [PSCustomObject]@{ Name = 'Sales' }
+        $project.PSObject.TypeNames.Insert(0, 'Ssis.Project')
+
+        $null = $project | Export-SsisProject -Path 'C:\out' -Force -Confirm:$false
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName Set-Content -ModuleName $script:moduleName -Times 1 -Scope It
+    }
+
+    It 'Errors and does not export a piped project when the output directory does not exist (ByObject)' {
+        Mock -CommandName Test-Path -ModuleName $script:moduleName -MockWith { $false } -ParameterFilter { $PathType -eq 'Container' }
+        $project = [PSCustomObject]@{ Name = 'Sales' }
+        $project.PSObject.TypeNames.Insert(0, 'Ssis.Project')
+
+        $null = $project | Export-SsisProject -Path 'C:\missing' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName Export-SsisProjectObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
+
     It 'Forwards the SqlCredential to Connect-SsisCatalog' {
         $cred = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString 'p@ss' -AsPlainText -Force))
         $null = Export-SsisProject -SqlInstance 'TestInstance' -Folder 'Finance' -Name 'Sales' -Path 'C:\out' -SqlCredential $cred -Confirm:$false

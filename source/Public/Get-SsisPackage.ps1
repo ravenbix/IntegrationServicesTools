@@ -12,14 +12,50 @@ function Get-SsisPackage
             catalog or named folder does not exist.
 
         .EXAMPLE
+            Get-SsisPackage -SqlInstance 'SQL01\PROD'
+
+            Returns every package of every project in every folder of the SSISDB catalog, using the
+            current Windows identity (integrated authentication).
+
+        .EXAMPLE
+            Get-SsisPackage -SqlInstance 'SQL01\PROD' -Folder 'Finance'
+
+            Returns the packages of every project in the Finance folder, leaving -Project unscoped.
+
+        .EXAMPLE
             Get-SsisPackage -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales'
 
             Returns the packages in the Sales project of the Finance folder.
 
         .EXAMPLE
+            Get-SsisPackage -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'Load.dtsx'
+
+            Returns just the Load.dtsx package from the Sales project. Writes a warning when no
+            package of that name is found in scope.
+
+        .EXAMPLE
+            Get-SsisPackage -SqlInstance 'SQL01\PROD' -Name 'Load.dtsx'
+
+            Returns the Load.dtsx package wherever it lives, searching every project of every folder
+            because -Folder and -Project were both omitted.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisPackage -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Project 'Sales'
+
+            Connects with SQL Server authentication using the supplied credential and returns the
+            packages in the Sales project of the Finance folder.
+
+        .EXAMPLE
             Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' | Get-SsisPackage
 
-            Returns the packages of every project piped in from Get-SsisProject.
+            Returns the packages of every project piped in from Get-SsisProject (ByObject), reusing
+            the existing connection.
+
+        .EXAMPLE
+            Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' | Get-SsisPackage -Name 'Load.dtsx'
+
+            Pipes the Sales project in (ByObject) and returns just its Load.dtsx package.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

@@ -47,6 +47,12 @@ Describe 'Remove-SsisEnvironment' {
         Should -Invoke -CommandName Remove-SsisEnvironmentObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
 
+    It 'Forwards the SqlCredential to Connect-SsisCatalog when given' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+        Remove-SsisEnvironment -SqlInstance 'TestInstance' -SqlCredential $credential -Folder 'Finance' -Name 'Prod' -Confirm:$false
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $SqlCredential.UserName -eq 'sa' }
+    }
+
     Context 'ByObject' {
         It 'Removes a piped environment without connecting' {
             $environment = [PSCustomObject]@{ Name = 'Prod' }
@@ -55,6 +61,15 @@ Describe 'Remove-SsisEnvironment' {
             $environment | Remove-SsisEnvironment -Confirm:$false
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Remove-SsisEnvironmentObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Environment.Name -eq 'Prod' }
+        }
+
+        It 'Does not remove a piped environment under -WhatIf' {
+            $environment = [PSCustomObject]@{ Name = 'Prod' }
+            $environment.PSObject.TypeNames.Insert(0, 'Ssis.Environment')
+
+            $environment | Remove-SsisEnvironment -WhatIf
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Remove-SsisEnvironmentObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
         }
     }
 }

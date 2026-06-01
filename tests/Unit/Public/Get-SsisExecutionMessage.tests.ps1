@@ -29,6 +29,34 @@ Describe 'Get-SsisExecutionMessage' {
         $result[0].PSObject.TypeNames | Should -Contain 'Ssis.ExecutionMessage'
     }
 
+    It 'Passes -SqlCredential through to Connect-SsisCatalog with -ExecutionId' {
+        Mock -CommandName Get-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 42 }
+        }
+        Mock -CommandName Get-SsisExecutionMessageObject -ModuleName $script:moduleName -MockWith { $script:messages }
+
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = Get-SsisExecutionMessage -SqlInstance 'TestInstance' -SqlCredential $credential -ExecutionId 42
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Lets callers narrow the returned log by MessageType with Where-Object' {
+        Mock -CommandName Get-SsisExecutionObject -ModuleName $script:moduleName -MockWith {
+            [PSCustomObject]@{ Id = 42 }
+        }
+        Mock -CommandName Get-SsisExecutionMessageObject -ModuleName $script:moduleName -MockWith { $script:messages }
+
+        $result = Get-SsisExecutionMessage -SqlInstance 'TestInstance' -ExecutionId 42 |
+            Where-Object -FilterScript { $_.MessageType -eq 120 }
+
+        ($result | Measure-Object).Count | Should -Be 1
+        $result.MessageType | Should -Be 120
+    }
+
     It 'Warns and returns nothing when the catalog does not exist' {
         Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
         $result = Get-SsisExecutionMessage -SqlInstance 'TestInstance' -ExecutionId 1 -WarningAction SilentlyContinue

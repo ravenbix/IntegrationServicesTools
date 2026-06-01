@@ -18,6 +18,25 @@ function New-SsisEnvironmentReference
             Creates a relative reference from the Sales project to the Prod environment in the Finance folder.
 
         .EXAMPLE
+            New-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -EnvironmentFolder 'Shared'
+
+            Creates an absolute reference from the Sales project to the Prod environment in the Shared
+            folder, rather than a relative reference within the project's own folder.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            New-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Project 'Sales' -Environment 'Prod'
+
+            Connects with SQL Server authentication using the supplied credential and creates a
+            relative reference from the Sales project to the Prod environment.
+
+        .EXAMPLE
+            New-SsisEnvironmentReference -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Environment 'Prod' -Confirm:$false
+
+            Creates the reference without prompting for confirmation (New-SsisEnvironmentReference
+            supports ShouldProcess at a Low ConfirmImpact, so it does not prompt by default).
+
+        .EXAMPLE
             Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' | New-SsisEnvironmentReference -Environment 'Prod' -EnvironmentFolder 'Shared'
 
             Creates an absolute reference from the piped project to the Prod environment in the Shared folder.

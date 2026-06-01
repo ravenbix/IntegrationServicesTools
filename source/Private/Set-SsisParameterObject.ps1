@@ -15,6 +15,11 @@ function Set-SsisParameterObject
 
             Sets the parameter to the literal value 1450 and alters the project to persist it.
 
+        .EXAMPLE
+            Set-SsisParameterObject -Parameter $parameter -ValueType 'Referenced' -Value 'Port' -Project $project
+
+            Binds the parameter to the Port environment variable and alters the project to persist it.
+
         .PARAMETER Parameter
             The SSISDB ParameterInfo object whose value to set, as returned by Get-SsisParameterObject.
 

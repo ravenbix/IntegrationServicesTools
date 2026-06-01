@@ -52,5 +52,23 @@ Describe 'ConvertTo-SsisTypeCode' {
                 { ConvertTo-SsisTypeCode -Value 1 -DataType 'Guid' } | Should -Throw -ExpectedMessage '*Guid*'
             }
         }
+
+        It 'Lists the valid type names in the unsupported-type error message' {
+            InModuleScope $script:moduleName {
+                { ConvertTo-SsisTypeCode -Value 1 -DataType 'Guid' } | Should -Throw -ExpectedMessage '*Boolean*Byte*'
+            }
+        }
+
+        It 'Falls back to value inference when -DataType is an empty string' {
+            InModuleScope $script:moduleName {
+                (ConvertTo-SsisTypeCode -Value 42 -DataType '').ToString() | Should -Be 'Int32'
+            }
+        }
+
+        It 'Infers String from a null value when -DataType is an empty string' {
+            InModuleScope $script:moduleName {
+                (ConvertTo-SsisTypeCode -Value $null -DataType '').ToString() | Should -Be 'String'
+            }
+        }
     }
 }

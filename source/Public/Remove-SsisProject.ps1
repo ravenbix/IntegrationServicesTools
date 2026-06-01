@@ -13,7 +13,31 @@ function Remove-SsisProject
         .EXAMPLE
             Remove-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales'
 
-            Removes the Sales project from the Finance folder on the named instance.
+            Removes the Sales project from the Finance folder on the named instance, prompting for
+            confirmation first (the command is ConfirmImpact High).
+
+        .EXAMPLE
+            Remove-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' -Confirm:$false
+
+            Removes the Sales project without prompting, for use in unattended scripts.
+
+        .EXAMPLE
+            Remove-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' -WhatIf
+
+            Reports the project that would be removed without dropping anything from the catalog.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Remove-SsisProject -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Name 'Sales' -Confirm:$false
+
+            Connects with SQL Server authentication using the supplied credential and removes the
+            Sales project from the Finance folder.
+
+        .EXAMPLE
+            Get-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Sales' | Remove-SsisProject -Confirm:$false
+
+            Pipes an Ssis.Project object in (ByObject) and drops it, reusing the existing connection
+            instead of reconnecting via -SqlInstance.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

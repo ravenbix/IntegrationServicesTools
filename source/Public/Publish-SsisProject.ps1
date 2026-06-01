@@ -15,7 +15,39 @@ function Publish-SsisProject
         .EXAMPLE
             Publish-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Path 'C:\build\Sales.ispac'
 
-            Deploys Sales.ispac into the Finance folder as the project named Sales.
+            Deploys Sales.ispac into the Finance folder as the project named Sales (the catalog name
+            defaulting to the .ispac file name), using the current Windows identity.
+
+        .EXAMPLE
+            Publish-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Path 'C:\build\Sales.ispac' -Name 'SalesProd'
+
+            Deploys Sales.ispac into the Finance folder under the overridden catalog project name
+            SalesProd instead of the file-derived name.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            $splatPublish = @{
+                SqlInstance   = 'SQL01\PROD'
+                SqlCredential = $cred
+                Folder        = 'Finance'
+                Path          = 'C:\build\Sales.ispac'
+            }
+            Publish-SsisProject @splatPublish
+
+            Connects with SQL Server authentication using the supplied credential and deploys
+            Sales.ispac into the Finance folder.
+
+        .EXAMPLE
+            Publish-SsisProject -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Path 'C:\build\Sales.ispac' -WhatIf
+
+            Reports the project that would be deployed without reading the .ispac file or contacting
+            the catalog to deploy.
+
+        .EXAMPLE
+            Get-SsisFolder -SqlInstance 'SQL01\PROD' -Name 'Finance' | Publish-SsisProject -Path 'C:\build\Sales.ispac'
+
+            Pipes the Finance folder in (ByObject) and deploys Sales.ispac into it, reusing the
+            existing connection instead of reconnecting via -SqlInstance.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

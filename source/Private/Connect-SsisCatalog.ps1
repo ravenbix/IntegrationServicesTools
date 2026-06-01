@@ -16,6 +16,24 @@ function Connect-SsisCatalog
 
             Connects to the named instance using the current Windows identity.
 
+        .EXAMPLE
+            $cred = Get-Credential
+            $integrationServices = Connect-SsisCatalog -SqlInstance 'SQL01\PROD' -SqlCredential $cred
+
+            Connects to the named instance with SQL Server authentication using the supplied
+            credential.
+
+        .EXAMPLE
+            $integrationServices = Connect-SsisCatalog -SqlInstance $existingIntegrationServices
+
+            Reuses an existing IntegrationServices object as-is, opening no new connection.
+
+        .EXAMPLE
+            $integrationServices = Connect-SsisCatalog -SqlInstance $smoServer
+
+            Wraps an already-built SMO Server object in an IntegrationServices object, reusing its
+            connection rather than resolving an instance name.
+
         .PARAMETER SqlInstance
             The target SQL Server instance name (for example 'SQL01\PROD'), or an already-built SMO
             Server or IntegrationServices object to reuse instead of opening a new connection.

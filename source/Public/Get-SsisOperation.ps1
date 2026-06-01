@@ -26,6 +26,25 @@ function Get-SsisOperation
 
             Returns every failed operation in the catalog.
 
+        .EXAMPLE
+            Get-SsisOperation -SqlInstance 'SQL01\PROD' -Status 'Failed' -Top 5
+
+            Returns the 5 most recent failed operations, newest first (combining the -Status filter
+            with the -Top cap).
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisOperation -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Top 20
+
+            Connects with SQL Server authentication using the supplied credential and returns the 20
+            most recent operations.
+
+        .EXAMPLE
+            Get-SsisCatalog -SqlInstance 'SQL01\PROD' | Get-SsisOperation -Status 'Running'
+
+            Pipes the catalog in (the ByObject parameter set) and lists its running operations without
+            reconnecting.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

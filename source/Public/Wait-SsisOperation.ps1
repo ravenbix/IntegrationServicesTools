@@ -23,6 +23,24 @@ function Wait-SsisOperation
 
             Starts a project validation and waits up to two minutes for it to finish.
 
+        .EXAMPLE
+            $cred = Get-Credential
+            Wait-SsisOperation -SqlInstance 'SQL01\PROD' -SqlCredential $cred -OperationId 42
+
+            Connects with SQL Server authentication using the supplied credential and waits for
+            operation 42 to finish.
+
+        .EXAMPLE
+            Wait-SsisOperation -SqlInstance 'SQL01\PROD' -OperationId 42 -PollInterval 1 -Timeout 30
+
+            Refreshes the operation status every second and waits up to 30 seconds before writing a
+            non-terminating error and returning the still-running operation.
+
+        .EXAMPLE
+            Get-SsisOperation -SqlInstance 'SQL01\PROD' -OperationId 42 | Wait-SsisOperation
+
+            Pipes an operation in (the ByObject parameter set) and waits for it without reconnecting.
+
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or
             IntegrationServices object to reuse an existing connection.

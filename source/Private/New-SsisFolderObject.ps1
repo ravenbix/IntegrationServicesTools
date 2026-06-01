@@ -14,6 +14,11 @@ function New-SsisFolderObject
 
             Creates the Finance folder and returns it.
 
+        .EXAMPLE
+            $folder = New-SsisFolderObject -Catalog $catalog -Name 'Finance' -Description ''
+
+            Creates the Finance folder with an empty description and returns it.
+
         .PARAMETER Catalog
             The SSISDB Catalog object under which to create the folder.
 

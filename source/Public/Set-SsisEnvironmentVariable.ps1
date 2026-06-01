@@ -19,9 +19,57 @@ function Set-SsisEnvironmentVariable
             Adds or updates the Int32 Port variable on the Prod environment.
 
         .EXAMPLE
+            $splatSetVariable = @{
+                SqlInstance = 'SQL01\PROD'
+                Folder      = 'Finance'
+                Environment = 'Prod'
+                Name        = 'Port'
+                Value       = '1433'
+                DataType    = 'Int32'
+            }
+            Set-SsisEnvironmentVariable @splatSetVariable
+
+            Adds or updates the Port variable, forcing the Int32 data type with -DataType even though
+            the supplied value is a string.
+
+        .EXAMPLE
+            $splatSetVariable = @{
+                SqlInstance = 'SQL01\PROD'
+                Folder      = 'Finance'
+                Environment = 'Prod'
+                Name        = 'Server'
+                Value       = 'sql01.contoso.com'
+                Description = 'Target database server'
+            }
+            Set-SsisEnvironmentVariable @splatSetVariable
+
+            Adds or updates the String Server variable with a description. The data type is inferred
+            from the string value.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            $splatSetVariable = @{
+                SqlInstance   = 'SQL01\PROD'
+                SqlCredential = $cred
+                Folder        = 'Finance'
+                Environment   = 'Prod'
+                Name          = 'Enabled'
+                Value         = $true
+            }
+            Set-SsisEnvironmentVariable @splatSetVariable
+
+            Connects with SQL Server authentication and adds or updates the Boolean Enabled variable,
+            inferring the type from the supplied boolean value.
+
+        .EXAMPLE
             Get-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' | Set-SsisEnvironmentVariable -Name 'Password' -Value 'secret' -Sensitive
 
             Adds or updates a sensitive Password variable on the piped Prod environment.
+
+        .EXAMPLE
+            Set-SsisEnvironmentVariable -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Environment 'Prod' -Name 'Port' -Value 1433 -WhatIf
+
+            Shows what would be set without making any change.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

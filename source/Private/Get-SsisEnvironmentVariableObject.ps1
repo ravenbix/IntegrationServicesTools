@@ -14,6 +14,16 @@ function Get-SsisEnvironmentVariableObject
 
             Returns the ConnString variable, or $null when it does not exist.
 
+        .EXAMPLE
+            $variable = Get-SsisEnvironmentVariableObject -Environment $environment -Name 'Missing'
+
+            Returns $null because no variable named 'Missing' exists in the environment.
+
+        .EXAMPLE
+            $variables = Get-SsisEnvironmentVariableObject -Environment $environment
+
+            Returns the environment's whole Variables collection because no -Name was given.
+
         .PARAMETER Environment
             The SSISDB EnvironmentInfo object whose variables to read, as returned by Get-SsisEnvironmentObject.
 

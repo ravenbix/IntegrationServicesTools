@@ -40,6 +40,16 @@ Describe 'Get-SsisProject' {
             Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Sales' }
         }
 
+        It 'Searches every folder for a named project when -Name is given without -Folder' {
+            $result = Get-SsisProject -SqlInstance 'TestInstance' -Name 'Sales'
+            # -Folder omitted: every folder (F1, F2) is enumerated, each queried by project name, so
+            # the named project is returned once per folder that contains it.
+            ($result | Measure-Object).Count | Should -Be 2
+            $result[0].Name | Should -Be 'Sales'
+            Should -Invoke -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { -not $Name }
+            Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 2 -Scope It -ParameterFilter { $Name -eq 'Sales' }
+        }
+
         It 'Warns and returns nothing when the catalog does not exist' {
             Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
             $result = Get-SsisProject -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
@@ -76,6 +86,26 @@ Describe 'Get-SsisProject' {
             $result.PSObject.TypeNames | Should -Contain 'Ssis.Project'
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Folder.Name -eq 'Finance' }
+        }
+
+        It 'Returns a single named project from a piped folder without connecting' {
+            $folder = [PSCustomObject]@{ Name = 'Finance' }
+            $folder.PSObject.TypeNames.Insert(0, 'Ssis.Folder')
+
+            $result = $folder | Get-SsisProject -Name 'Sales'
+            $result.Name | Should -Be 'Sales'
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Sales' }
+        }
+
+        It 'Warns when a named project is not found in a piped folder' {
+            Mock -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -MockWith { $null }
+            $folder = [PSCustomObject]@{ Name = 'Finance' }
+            $folder.PSObject.TypeNames.Insert(0, 'Ssis.Folder')
+
+            $result = $folder | Get-SsisProject -Name 'Missing' -WarningVariable warnings -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            $warnings | Should -Not -BeNullOrEmpty
         }
     }
 }

@@ -13,12 +13,32 @@ function Remove-SsisEnvironment
         .EXAMPLE
             Remove-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod'
 
-            Removes the Prod environment from the Finance folder on the named instance.
+            Removes the Prod environment from the Finance folder on the named instance, prompting
+            for confirmation first (ConfirmImpact is High).
+
+        .EXAMPLE
+            Remove-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' -Confirm:$false
+
+            Removes the Prod environment without prompting for confirmation.
+
+        .EXAMPLE
+            Remove-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' -WhatIf
+
+            Reports that the Prod environment would be removed without making any change, then
+            returns.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Remove-SsisEnvironment -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Folder 'Finance' -Name 'Prod' -Confirm:$false
+
+            Connects with SQL Server authentication using the supplied credential and removes the
+            Prod environment from the Finance folder.
 
         .EXAMPLE
             Get-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' | Remove-SsisEnvironment
 
-            Removes the piped Prod environment.
+            Removes the piped Prod environment (the ByObject parameter set, reusing the
+            environment's existing connection).
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

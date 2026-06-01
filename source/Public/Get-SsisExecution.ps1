@@ -14,7 +14,14 @@
         .EXAMPLE
             Get-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42
 
-            Returns the execution with id 42.
+            Returns the single execution with id 42. The folder/project/package filters are ignored
+            when -ExecutionId is given.
+
+        .EXAMPLE
+            Get-SsisExecution -SqlInstance 'SQL01\PROD'
+
+            Returns every execution in the catalog, using the current Windows identity (integrated
+            authentication).
 
         .EXAMPLE
             Get-SsisExecution -SqlInstance 'SQL01\PROD' -Status 'Running'
@@ -22,9 +29,39 @@
             Returns every currently running execution in the catalog.
 
         .EXAMPLE
+            Get-SsisExecution -SqlInstance 'SQL01\PROD' -Folder 'Finance'
+
+            Returns the executions scoped to the 'Finance' folder, across all of its projects and
+            packages.
+
+        .EXAMPLE
+            $splatExecution = @{
+                SqlInstance = 'SQL01\PROD'
+                Folder      = 'Finance'
+                Project     = 'Sales'
+                Package     = 'Load.dtsx'
+                Status      = 'Failed'
+            }
+            Get-SsisExecution @splatExecution
+
+            Returns the failed executions of the 'Load.dtsx' package in the 'Sales' project of the
+            'Finance' folder.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Get-SsisExecution -SqlInstance 'SQL01\PROD' -SqlCredential $cred -Status 'Running'
+
+            Connects with SQL Server authentication and returns every currently running execution.
+
+        .EXAMPLE
             Get-SsisPackage -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'Load.dtsx' | Get-SsisExecution
 
-            Returns the executions of the piped package.
+            Returns the executions of the piped package, reusing the package's existing connection.
+
+        .EXAMPLE
+            Get-SsisPackage -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Project 'Sales' -Name 'Load.dtsx' | Get-SsisExecution -Status 'Running'
+
+            Returns only the currently running executions of the piped package.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

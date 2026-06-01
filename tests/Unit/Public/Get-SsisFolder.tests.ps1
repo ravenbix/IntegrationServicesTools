@@ -37,4 +37,35 @@ Describe 'Get-SsisFolder' {
         $result = Get-SsisFolder -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
         $result | Should -BeNullOrEmpty
     }
+
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = Get-SsisFolder -SqlInstance 'TestInstance' -SqlCredential $credential
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Returns a single folder with SQL auth when -SqlCredential and -Name are given together' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $result = Get-SsisFolder -SqlInstance 'TestInstance' -SqlCredential $credential -Name 'Finance'
+
+        ($result | Measure-Object).Count | Should -Be 1
+        $result.Name | Should -Be 'Finance'
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+        Should -Invoke -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $Name -eq 'Finance'
+        }
+    }
+
+    It 'Accepts the instance from the pipeline (ByObject-style fluent input)' {
+        $result = 'TestInstance' | Get-SsisFolder
+        ($result | Measure-Object).Count | Should -Be 2
+        $result[0].PSObject.TypeNames | Should -Contain 'Ssis.Folder'
+    }
 }

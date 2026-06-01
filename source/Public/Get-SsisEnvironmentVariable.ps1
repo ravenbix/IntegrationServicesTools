@@ -17,9 +17,34 @@ function Get-SsisEnvironmentVariable
             Returns the variables of the Prod environment in the Finance folder.
 
         .EXAMPLE
+            Get-SsisEnvironmentVariable -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Environment 'Prod' -Name 'Port'
+
+            Returns just the Port variable from the Prod environment. Writes a warning and returns
+            nothing when no variable of that name exists.
+
+        .EXAMPLE
+            $cred = Get-Credential
+            $splatGetVariable = @{
+                SqlInstance   = 'SQL01\PROD'
+                SqlCredential = $cred
+                Folder        = 'Finance'
+                Environment   = 'Prod'
+            }
+            Get-SsisEnvironmentVariable @splatGetVariable
+
+            Connects with SQL Server authentication using the supplied credential and returns every
+            variable in the Prod environment.
+
+        .EXAMPLE
             Get-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' | Get-SsisEnvironmentVariable
 
             Returns the variables of the piped Prod environment.
+
+        .EXAMPLE
+            Get-SsisEnvironment -SqlInstance 'SQL01\PROD' -Folder 'Finance' -Name 'Prod' | Get-SsisEnvironmentVariable -Name 'Port'
+
+            Returns just the Port variable of the piped Prod environment, reusing the existing
+            connection.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

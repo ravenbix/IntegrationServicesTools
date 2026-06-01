@@ -5,6 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Comprehensive comment-based help: every public and private function now carries one `.EXAMPLE`
+  per meaningful parameter combination (each parameter set, each behaviour-changing optional
+  parameter, and the key pairings), in addition to the existing single example.
+- Per-parameter-combination unit tests: each public command now has a unit test for every
+  meaningful parameter combination (including `-SqlCredential` pass-through, pipeline/ByObject
+  input, and `-WhatIf` gating on state-changers), plus added branch coverage for the pure private
+  helpers (e.g. `ConvertTo-SsisTypeCode`, `Add-SsisTypeName`).
+
 ### Fixed
 
 - Corrected ServerOperationStatus enum member names used by Wait-SsisExecution (terminalStates),

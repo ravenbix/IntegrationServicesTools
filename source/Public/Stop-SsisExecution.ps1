@@ -15,12 +15,35 @@ function Stop-SsisExecution
         .EXAMPLE
             Stop-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42 -Confirm:$false
 
-            Cancels execution 42 without prompting.
+            Cancels execution 42 without prompting, emitting nothing.
+
+        .EXAMPLE
+            Stop-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42
+
+            Prompts for confirmation (ConfirmImpact High) before cancelling execution 42, because
+            cancelling an in-flight run is irreversible.
+
+        .EXAMPLE
+            Stop-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42 -WhatIf
+
+            Shows that execution 42 would be cancelled, without actually cancelling it.
+
+        .EXAMPLE
+            Stop-SsisExecution -SqlInstance 'SQL01\PROD' -ExecutionId 42 -PassThru -Confirm:$false
+
+            Cancels execution 42 and returns the refreshed Ssis.Execution (now Stopping or Canceled).
+
+        .EXAMPLE
+            $cred = Get-Credential
+            Stop-SsisExecution -SqlInstance 'SQL01\PROD' -SqlCredential $cred -ExecutionId 42 -Confirm:$false
+
+            Connects with SQL Server authentication and cancels execution 42.
 
         .EXAMPLE
             Get-SsisExecution -SqlInstance 'SQL01\PROD' -Status 'Running' | Stop-SsisExecution -PassThru -Confirm:$false | Wait-SsisExecution
 
-            Cancels every running execution and waits for each to settle.
+            Cancels every running execution (reusing each piped execution's connection) and waits for
+            each to settle.
 
         .PARAMETER SqlInstance
             The SQL Server instance hosting SSISDB (for example 'SQL01\PROD'), or an SMO Server or

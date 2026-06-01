@@ -31,4 +31,26 @@ Describe 'Remove-SsisFolder' {
         Remove-SsisFolder -SqlInstance 'TestInstance' -Name 'Finance' -WhatIf
         Should -Invoke -CommandName Remove-SsisFolderObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
     }
+
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        Remove-SsisFolder -SqlInstance 'TestInstance' -SqlCredential $credential -Name 'Finance' -Confirm:$false
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
+    It 'Accepts the instance from the pipeline and drops the folder' {
+        'TestInstance' | Remove-SsisFolder -Name 'Finance' -Confirm:$false
+        Should -Invoke -CommandName Remove-SsisFolderObject -ModuleName $script:moduleName -Exactly -Times 1 -Scope It
+    }
+
+    It 'Errors and does not drop when the catalog does not exist' {
+        Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
+        Remove-SsisFolder -SqlInstance 'TestInstance' -Name 'Finance' -Confirm:$false -ErrorAction SilentlyContinue -ErrorVariable err
+        $err | Should -Not -BeNullOrEmpty
+        Should -Invoke -CommandName Remove-SsisFolderObject -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+    }
 }

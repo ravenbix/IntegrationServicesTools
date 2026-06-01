@@ -32,6 +32,29 @@ Describe 'Get-SsisPackage' {
             Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Sales' }
         }
 
+        It 'Enumerates every project of a folder when -Project is omitted' {
+            $null = Get-SsisPackage -SqlInstance 'TestInstance' -Folder 'Finance'
+            # -Project omitted: the folder's projects are enumerated unscoped (no -Name on the project query).
+            Should -Invoke -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Finance' }
+            Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { -not $Name }
+        }
+
+        It 'Returns a single named package when -Folder, -Project and -Name are given' {
+            $result = Get-SsisPackage -SqlInstance 'TestInstance' -Folder 'Finance' -Project 'Sales' -Name 'Load.dtsx'
+            $result.Name | Should -Be 'Load.dtsx'
+            Should -Invoke -CommandName Get-SsisPackageObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Load.dtsx' }
+        }
+
+        It 'Searches every project of every folder for a named package when only -Name is given' {
+            Mock -CommandName Get-SsisFolderObject -ModuleName $script:moduleName -MockWith {
+                @([PSCustomObject]@{ Name = 'F1' }, [PSCustomObject]@{ Name = 'F2' })
+            }
+            $result = Get-SsisPackage -SqlInstance 'TestInstance' -Name 'Load.dtsx'
+            ($result | Measure-Object).Count | Should -Be 2
+            Should -Invoke -CommandName Get-SsisProjectObject -ModuleName $script:moduleName -Times 2 -Scope It -ParameterFilter { -not $Name }
+            Should -Invoke -CommandName Get-SsisPackageObject -ModuleName $script:moduleName -Times 2 -Scope It -ParameterFilter { $Name -eq 'Load.dtsx' }
+        }
+
         It 'Warns and returns nothing when the catalog does not exist' {
             Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
             $result = Get-SsisPackage -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
@@ -79,6 +102,26 @@ Describe 'Get-SsisPackage' {
             $result.PSObject.TypeNames | Should -Contain 'Ssis.Package'
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             Should -Invoke -CommandName Get-SsisPackageObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Project.Name -eq 'Sales' }
+        }
+
+        It 'Returns a single named package from a piped project without connecting' {
+            $project = [PSCustomObject]@{ Name = 'Sales' }
+            $project.PSObject.TypeNames.Insert(0, 'Ssis.Project')
+
+            $result = $project | Get-SsisPackage -Name 'Load.dtsx'
+            $result.Name | Should -Be 'Load.dtsx'
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-SsisPackageObject -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter { $Name -eq 'Load.dtsx' }
+        }
+
+        It 'Warns when a named package is not found in a piped project' {
+            Mock -CommandName Get-SsisPackageObject -ModuleName $script:moduleName -MockWith { $null }
+            $project = [PSCustomObject]@{ Name = 'Sales' }
+            $project.PSObject.TypeNames.Insert(0, 'Ssis.Project')
+
+            $result = $project | Get-SsisPackage -Name 'Missing.dtsx' -WarningVariable warnings -WarningAction SilentlyContinue
+            $result | Should -BeNullOrEmpty
+            $warnings | Should -Not -BeNullOrEmpty
         }
     }
 }

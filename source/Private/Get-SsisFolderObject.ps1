@@ -14,6 +14,11 @@ function Get-SsisFolderObject
 
             Returns the Finance folder, or $null when it does not exist.
 
+        .EXAMPLE
+            $folders = Get-SsisFolderObject -Catalog $catalog
+
+            Returns every folder in the catalog's Folders collection when no name is given.
+
         .PARAMETER Catalog
             The SSISDB Catalog object, as returned by Get-SsisCatalogObject.
 

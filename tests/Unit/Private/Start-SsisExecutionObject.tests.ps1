@@ -48,6 +48,53 @@ Describe 'Start-SsisExecutionObject' {
         }
     }
 
+    It 'Passes an empty value-parameter set when neither logging nor parameters are given' {
+        InModuleScope $script:moduleName {
+            $package = [PSCustomObject]@{ Use32 = $null }
+            $package | Add-Member -MemberType 'NoteProperty' -Name 'Parameters' -Value @{}
+            $package | Add-Member -MemberType 'ScriptMethod' -Name 'Execute' -Value {
+                param ($use32, $reference, $setValues)
+                $this.Use32 = $use32
+                $script:captured = $setValues
+                return [long] 5
+            }
+
+            $result = Start-SsisExecutionObject -Package $package -Reference $null
+
+            $result | Should -Be 5
+            $package.Use32 | Should -BeFalse
+            $script:captured.Count | Should -Be 0
+        }
+    }
+
+    It 'Combines a logging-level set with parameter overrides' {
+        InModuleScope $script:moduleName {
+            $package = [PSCustomObject]@{}
+            $package | Add-Member -MemberType 'NoteProperty' -Name 'Parameters' -Value @{ 'PkgParam' = 'x' }
+            $package | Add-Member -MemberType 'ScriptMethod' -Name 'Execute' -Value {
+                param ($use32, $reference, $setValues)
+                $script:captured = $setValues
+                return [long] 1
+            }
+
+            $splatStart = @{
+                Package      = $package
+                Reference    = $null
+                Parameter    = @{ 'PkgParam' = 7 }
+                LoggingLevel = 'Performance'
+            }
+            $null = Start-SsisExecutionObject @splatStart
+
+            $script:captured.Count | Should -Be 2
+            $logging = $script:captured | Where-Object -FilterScript { $_.ParameterName -eq 'LOGGING_LEVEL' }
+            $param = $script:captured | Where-Object -FilterScript { $_.ParameterName -eq 'PkgParam' }
+            $logging.ObjectType | Should -Be 50
+            $logging.ParameterValue | Should -Be 2
+            $param.ObjectType | Should -Be 30
+            $param.ParameterValue | Should -Be 7
+        }
+    }
+
     It 'Resolves parameter scope: package parameter is object type 30, project parameter 20' {
         InModuleScope $script:moduleName {
             $package = [PSCustomObject]@{}

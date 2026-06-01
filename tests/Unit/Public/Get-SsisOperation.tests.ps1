@@ -56,6 +56,18 @@ Describe 'Get-SsisOperation' {
         $result[0].Status | Should -Be 'Success'
     }
 
+    It 'Passes -SqlCredential through to Connect-SsisCatalog when given' {
+        Mock -CommandName Get-SsisOperationObject -ModuleName $script:moduleName -MockWith { $script:allOps }
+
+        $credential = [System.Management.Automation.PSCredential]::new('sa', (ConvertTo-SecureString -String 'p@ss' -AsPlainText -Force))
+
+        $null = Get-SsisOperation -SqlInstance 'TestInstance' -SqlCredential $credential -Top 20
+
+        Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Times 1 -Scope It -ParameterFilter {
+            $SqlCredential.UserName -eq 'sa'
+        }
+    }
+
     It 'Warns and returns nothing when the catalog does not exist' {
         Mock -CommandName Get-SsisCatalogObject -ModuleName $script:moduleName -MockWith { $null }
         $result = Get-SsisOperation -SqlInstance 'TestInstance' -WarningAction SilentlyContinue
@@ -72,6 +84,18 @@ Describe 'Get-SsisOperation' {
             $result = $catalog | Get-SsisOperation
             Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
             ($result | Measure-Object).Count | Should -Be 3
+        }
+
+        It 'Filters a piped Ssis.Catalog by -Status without reconnecting' {
+            Mock -CommandName Get-SsisOperationObject -ModuleName $script:moduleName -MockWith { $script:allOps }
+
+            $catalog = [PSCustomObject]@{ Name = 'SSISDB' }
+            $catalog.PSObject.TypeNames.Insert(0, 'Ssis.Catalog')
+
+            $result = $catalog | Get-SsisOperation -Status 'Failed'
+            Should -Invoke -CommandName Connect-SsisCatalog -ModuleName $script:moduleName -Exactly -Times 0 -Scope It
+            ($result | Measure-Object).Count | Should -Be 1
+            $result.Status | Should -Be 'Failed'
         }
     }
 }
