@@ -70,11 +70,11 @@ edits. Section layout:
 | 11 | Testing | Unit vs Integration split, `$env:SSIS_TEST_INSTANCE` opt-in | template |
 | 12 | License & acknowledgements | License; credit dbatools.library + Sampler | template |
 
-### `build/Build-SsisReadme.ps1`
+### `.build/Build-SsisReadme.ps1`
 
-A plain build-tooling script (not shipped in the module — it lives outside `source/`, so
-ModuleBuilder never merges it and the Sampler QA enumeration never flags it). Defines two
-functions:
+A plain build-tooling script in the Sampler `.build/` task folder (which `build.ps1` auto
+dot-sources; see build.ps1:324). It lives outside `source/`, so ModuleBuilder never merges it and
+the Sampler QA function-enumeration never flags it. Defines two functions:
 
 - **`ConvertTo-SsisReadme`** — *pure*. Inputs: template path (or content) and a public-source
   folder path. Reads the template, enumerates `*.ps1` in the source folder, parses each with the
@@ -89,8 +89,8 @@ Uses the project's AST + `GetHelpContent()` pattern already established in
 
 ### Build task `Generate_Readme`
 
-An Invoke-Build task (Sampler-discovered `*.build.ps1` in the build root, e.g.
-`Readme.build.ps1`) that dot-sources `build/Build-SsisReadme.ps1` and calls `Update-SsisReadme`.
+An Invoke-Build task in `.build/Readme.build.ps1` (auto-discovered by `build.ps1`) that
+dot-sources `.build/Build-SsisReadme.ps1` and calls `Update-SsisReadme`.
 
 - Added to the `build` workflow in `build.yaml` so `./build.ps1 -Tasks build` refreshes the README.
 - Independently runnable on demand: `./build.ps1 -Tasks Generate_Readme`.
@@ -180,8 +180,8 @@ means the committed README provably matches the source.
 |------|-------------|---------|
 | `README.template.md` | new | Hand-authored README prose + `<!-- SSIS:COMMANDS -->` token |
 | `README.md` | regenerated | Build artifact; no longer hand-edited |
-| `build/Build-SsisReadme.ps1` | new | `ConvertTo-SsisReadme` (pure) + `Update-SsisReadme` (writer) |
-| `Readme.build.ps1` | new | Invoke-Build `Generate_Readme` task |
+| `.build/Build-SsisReadme.ps1` | new | `ConvertTo-SsisReadme` (pure) + `Update-SsisReadme` (writer) |
+| `.build/Readme.build.ps1` | new | Invoke-Build `Generate_Readme` task |
 | `build.yaml` | changed | Add `Generate_Readme` to the `build` workflow |
 | `tests/Unit/Build-SsisReadme.tests.ps1` | new | Unit tests for the generator |
 | `tests/QA/Readme.tests.ps1` | new | Drift check |
