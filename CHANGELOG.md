@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Get-SsisEnvironment command.
 - Remove-SsisProject command.
 - Export-SsisProject command.
 - Publish-SsisProject command.
