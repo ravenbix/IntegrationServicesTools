@@ -149,5 +149,57 @@
         </TableRowEntries>
       </TableControl>
     </View>
+    <View>
+      <Name>Ssis.EnvironmentReference</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.EnvironmentReference</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Project</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Environment</Label></TableColumnHeader>
+          <TableColumnHeader><Label>EnvironmentFolder</Label></TableColumnHeader>
+          <TableColumnHeader><Label>ReferenceType</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><ScriptBlock>$_.Parent.Name</ScriptBlock></TableColumnItem>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>EnvironmentFolderName</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>ReferenceType</PropertyName></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>Ssis.Parameter</Name>
+      <ViewSelectedBy>
+        <TypeName>Ssis.Parameter</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Scope</Label></TableColumnHeader>
+          <TableColumnHeader><Label>DataType</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Sensitive</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Required</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Value</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>if ($_.Parent.GetType().Name -eq 'PackageInfo') { 'Package' } else { 'Project' }</ScriptBlock></TableColumnItem>
+              <TableColumnItem><PropertyName>DataType</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Sensitive</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Required</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>if ($_.ReferencedVariableName) { '@' + $_.ReferencedVariableName } else { $_.DefaultValue }</ScriptBlock></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
   </ViewDefinitions>
 </Configuration>

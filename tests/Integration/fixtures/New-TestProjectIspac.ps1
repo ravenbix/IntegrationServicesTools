@@ -79,6 +79,10 @@ try
     $package.Name = 'Package'
 
     $null = $project.PackageItems.Add($package, 'Package.dtsx')
+
+    # A single project parameter so the references/parameters integration test can set its value.
+    $parameter = $project.Parameters.Add('TargetPort', [System.TypeCode]::Int32)
+    $parameter.Value = 0
     $project.Save()
 }
 finally
