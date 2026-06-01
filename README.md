@@ -1,4 +1,4 @@
-<!-- Generated file â€” do not edit directly. Edit README.template.md, then run ./build.ps1 -Tasks Generate_Readme. -->
+<!-- Generated file — do not edit directly. Edit README.template.md, then run ./build.ps1 -Tasks Generate_Readme. -->
 # IntegrationServicesTools
 
 [![Build Status](https://img.shields.io/badge/build-pending-lightgrey.svg)](#)
@@ -7,14 +7,14 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Windows PowerShell 5.1](https://img.shields.io/badge/PowerShell-5.1%20Desktop-blue.svg)](#requirements)
 
-> PowerShell commands for administering the SQL Server Integration Services (SSIS) catalog â€” the SSISDB â€” under the Project Deployment Model.
+> PowerShell commands for administering the SQL Server Integration Services (SSIS) catalog — the SSISDB — under the Project Deployment Model.
 
 ## Overview
 
 IntegrationServicesTools wraps the `Microsoft.SqlServer.Management.IntegrationServices`
 managed object model in idiomatic PowerShell. It lets you create and configure the SSISDB
 catalog, manage folders, deploy and export `.ispac` projects, and administer environments,
-environment references, and parameter values â€” all without hand-writing T-SQL or clicking
+environment references, and parameter values — all without hand-writing T-SQL or clicking
 through SQL Server Management Studio.
 
 It targets administrators and DevOps engineers who automate SSIS deployments and want
@@ -22,19 +22,19 @@ composable, pipeline-friendly commands that return real objects.
 
 ## Features
 
-- **Catalog administration** â€” create, inspect, and configure the SSISDB catalog.
-- **Folder management** â€” create, update, and remove catalog folders.
-- **Project lifecycle** â€” deploy (`.ispac`) and export projects, list packages, remove projects.
-- **Environments** â€” create environments and manage their variables.
-- **Environment references & parameters** â€” wire projects to environments and override parameter values.
-- **Pipeline-native** â€” every command emits typed `Ssis.*` objects you can pipe between commands.
-- **Safe by default** â€” state-changing commands support `-WhatIf` and `-Confirm`; removals are high-impact.
+- **Catalog administration** — create, inspect, and configure the SSISDB catalog.
+- **Folder management** — create, update, and remove catalog folders.
+- **Project lifecycle** — deploy (`.ispac`) and export projects, list packages, remove projects.
+- **Environments** — create environments and manage their variables.
+- **Environment references & parameters** — wire projects to environments and override parameter values.
+- **Pipeline-native** — every command emits typed `Ssis.*` objects you can pipe between commands.
+- **Safe by default** — state-changing commands support `-WhatIf` and `-Confirm`; removals are high-impact.
 
 ## Requirements
 
 - **Windows PowerShell 5.1** (Desktop edition). PowerShell 7 is not supported.
 - **SQL Server 2012 or later** with an SSISDB catalog (Project Deployment Model). LocalDB cannot host SSISDB.
-- **[dbatools.library](https://www.powershellgallery.com/packages/dbatools.library)** â€” ships the
+- **[dbatools.library](https://www.powershellgallery.com/packages/dbatools.library)** — ships the
   SSIS managed object model assemblies this module loads at import. Install with
   `Install-Module dbatools.library`.
 - **Windows integrated authentication** by default; SQL logins are supported via `-SqlCredential`.
@@ -77,7 +77,7 @@ Get-SsisProject -SqlInstance $instance -Folder 'Finance'
   `-SqlCredential`) or a piped `Ssis.*` object that carries its own connection (`ByObject`), so you
   can fluently compose pipelines.
 - **Typed output.** Commands return native object-model instances decorated with a `PSTypeName`
-  (`Ssis.Catalog`, `Ssis.Folder`, `Ssis.Project`, â€¦). Custom table views are shipped via the
+  (`Ssis.Catalog`, `Ssis.Folder`, `Ssis.Project`, …). Custom table views are shipped via the
   module's format file; all native members remain accessible.
 - **ShouldProcess.** State-changing commands support `-WhatIf`/`-Confirm`; `Remove-*` commands are
   high-impact and prompt by default.
@@ -229,7 +229,7 @@ This module is built on the [Sampler](https://github.com/gaelcolas/Sampler) scaf
 ```
 
 Development follows test-driven development and [Conventional Commits](https://www.conventionalcommits.org/).
-See [CLAUDE.md](CLAUDE.md) for the full style guide. **Edit `README.template.md`, not `README.md`** â€”
+See [CLAUDE.md](CLAUDE.md) for the full style guide. **Edit `README.template.md`, not `README.md`** —
 the latter is generated.
 
 ## Testing
@@ -244,7 +244,7 @@ See [CHANGELOG.md](CHANGELOG.md) for released and unreleased changes.
 
 ## License & acknowledgements
 
-Licensed under the MIT License â€” see [LICENSE](LICENSE).
+Licensed under the MIT License — see [LICENSE](LICENSE).
 
 Built with the [Sampler](https://github.com/gaelcolas/Sampler) module scaffold. The SSIS managed
 object model assemblies are provided by [dbatools.library](https://github.com/dataplat/dbatools.library).

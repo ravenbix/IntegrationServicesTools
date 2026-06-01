@@ -173,7 +173,7 @@ function Get-SsisReadmeCommandInfo
 
     process
     {
-        $raw = Get-Content -Raw -Path $Path
+        $raw = Get-Content -Raw -Encoding UTF8 -Path $Path
         $ast = [System.Management.Automation.Language.Parser]::ParseInput($raw, [ref] $null, [ref] $null)
 
         $functionAst = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) |
@@ -240,7 +240,7 @@ function ConvertTo-SsisReadme
     process
     {
         $token = '<!-- SSIS:COMMANDS -->'
-        $template = Get-Content -Raw -Path $TemplatePath
+        $template = Get-Content -Raw -Encoding UTF8 -Path $TemplatePath
 
         if (-not $template.Contains($token))
         {
