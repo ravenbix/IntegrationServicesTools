@@ -1,4 +1,4 @@
-<!-- This file is generated from README.template.md. Do not edit by hand. Run ./build.ps1 -Tasks Generate_Readme. -->
+<!-- Generated file — do not edit directly. Edit README.template.md, then run ./build.ps1 -Tasks Generate_Readme. -->
 # IntegrationServicesTools
 
 [![Build Status](https://img.shields.io/badge/build-pending-lightgrey.svg)](#)
@@ -176,6 +176,7 @@ By default the module connects with the current Windows identity (integrated aut
 To use a SQL login, pass a credential:
 
 ```powershell
+$instance = 'localhost\SQL2019'
 $cred = Get-Credential
 Get-SsisCatalog -SqlInstance $instance -SqlCredential $cred
 ```
