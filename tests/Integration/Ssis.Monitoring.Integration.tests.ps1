@@ -77,4 +77,13 @@ Describe 'Execution monitoring (integration)' -Tag 'Integration' -Skip:$script:s
             $operations[0].Id | Should -BeGreaterThan $operations[-1].Id
         }
     }
+
+    It 'Filters operations by -Status' {
+        # The completed execution is itself an operation in its terminal status, so filtering by
+        # that status must return at least it, and every returned operation must match.
+        $status = $script:execution.Status.ToString()
+        $filtered = Get-SsisOperation -SqlInstance $script:instance -Status $status
+        ($filtered | Measure-Object).Count | Should -BeGreaterThan 0
+        ($filtered | Where-Object -FilterScript { $_.Status.ToString() -ne $status } | Measure-Object).Count | Should -Be 0
+    }
 }
